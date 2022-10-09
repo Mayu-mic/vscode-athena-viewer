@@ -75,7 +75,7 @@
       "activitybar": [
         {
           "id": "vscode-athena-viewer-view",
-          "title": "VSCode Athena Extension",
+          "title": "VSCode Athena Viewer",
           "icon": "assets/database.svg"
         }
       ]
