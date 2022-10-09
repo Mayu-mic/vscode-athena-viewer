@@ -1,0 +1,7 @@
+{
+	"run-query-command-title": "Amazon Athena: SQLを実行する",
+	"setup-configs-title": "Amazon Athena: 接続設定を変更する",
+	"config-not-found": "接続設定がありません。",
+	"mfa-code-not-found": "コードを入力してください。",
+	"editor-not-found": "アクティブなエディターがありません。"
+}

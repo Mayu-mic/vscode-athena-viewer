@@ -1,0 +1,120 @@
+{
+  "name": "vscode-athena-viewer",
+  "displayName": "VSCode Athena Viewer",
+  "description": "VSCode Athena Viewer",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Mayu-mic/vscode-athena-viewer"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "vscode": "^1.71.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:vscode-athena-viewer.runQuery",
+    "onCommand:vscode-athena-viewer.setupConfigs",
+    "onView:view-databases"
+  ],
+  "main": "./out/src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-athena-viewer.runQuery",
+        "title": "%run-query-command-title%"
+      },
+      {
+        "command": "vscode-athena-viewer.setupConfigs",
+        "title": "%setup-configs-title%"
+      },
+      {
+        "command": "vscode-athena-viewer.refreshDatabases",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vscode-athena-viewer.showTable",
+        "title": "preview",
+        "icon": "$(eye)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "vscode-athena-viewer.runQuery",
+          "when": "editorLangId == sql"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "vscode-athena-viewer.refreshDatabases",
+          "when": "view == view-databases",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vscode-athena-viewer.showTable",
+          "when": "view == view-databases && viewItem == table",
+          "group": "inline"
+        }
+      ]
+    },
+    "views": {
+      "vscode-athena-viewer-view": [
+        {
+          "id": "view-databases",
+          "name": "Databases"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vscode-athena-viewer-view",
+          "title": "VSCode Athena Extension",
+          "icon": "assets/database.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "view-databases",
+        "contents": "No configuration found.\n[Setup Configs](command:vscode-athena-viewer.setupConfigs)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "publish-local": "vsce package",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.71.0",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "@vscode/test-electron": "^2.1.5",
+    "eslint": "^8.20.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "typescript": "^4.7.4",
+    "vsce": "^2.11.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-athena": "^3.181.0",
+    "@aws-sdk/client-sts": "^3.181.0",
+    "@aws-sdk/credential-provider-ini": "^3.181.0",
+    "csv-stringify": "^6.2.0",
+    "vscode-nls": "^5.2.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+	"run-query-command-title": "Amazon Athena: Run SQL",
+	"setup-configs-title": "Amazon Athena: Setup configurations",
+	"config-not-found": "Config not found.",
+	"mfa-code-not-found": "Authentication code not found.",
+	"editor-not-found": "Editor not found."
+}

@@ -1,0 +1,21 @@
+{
+  "github": {
+    "release": true,
+    "assets": [
+      "vscode-athena-viewer-*.vsix"
+    ]
+  },
+  "git": {
+    "commit": false,
+    "push": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "hooks": {
+    "before:release": [
+      "npm ci",
+      "npm run publish-local"
+    ]
+  }
+}
