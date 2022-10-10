@@ -4,11 +4,13 @@ import * as vscode from 'vscode';
 import { QueryCommandProvider } from './commands/query';
 import { SetupConfigsCommandProvider } from './commands/setup-configs';
 import { WorkspaceStateConfigRepository } from './config/config-repository';
+import { PREVIEW_DOCUMENT_SCHEME } from './constants';
 import {
   CredentialsProvider,
   WorkspaceStateCredentialsRepository,
 } from './credentials/credentials';
 import { InputBoxConfigurationProvider } from './ui/input-box';
+import { AthenaTableViewer } from './ui/table-viewer';
 import { DatabasesViewProvider, TableItem } from './view/databases-view';
 
 // this method is called when your extension is activated
@@ -57,6 +59,10 @@ export function activate(context: vscode.ExtensionContext) {
       () => databasesView.refresh()
     ),
     vscode.window.registerTreeDataProvider('view-databases', databasesView),
+    vscode.workspace.registerTextDocumentContentProvider(
+      PREVIEW_DOCUMENT_SCHEME,
+      new AthenaTableViewer()
+    ),
   ];
 
   disposables.forEach((disposable) => context.subscriptions.push(disposable));

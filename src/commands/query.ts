@@ -1,4 +1,12 @@
-import { ProgressLocation, ViewColumn, window, workspace } from 'vscode';
+import {
+  languages,
+  ProgressLocation,
+  TextDocumentShowOptions,
+  Uri,
+  ViewColumn,
+  window,
+  workspace,
+} from 'vscode';
 import { AthenaClientWrapper, QueryResult } from '../athena';
 import {
   IConfigurationProvider,
@@ -13,6 +21,7 @@ import { localeString } from '../i18n';
 import { ExtensionConfig } from '../types';
 import { TableItem } from '../view/databases-view';
 import { stringify } from 'csv-stringify/sync';
+import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
@@ -79,14 +88,9 @@ export class QueryCommandProvider {
           const table = [result.columns, ...result.rows];
           const csv = stringify(table, { quoted_string: true });
 
-          const doc = await workspace.openTextDocument({
-            language: 'csv',
-            content: csv,
-          });
-
-          await window.showTextDocument(doc, {
+          await this.showPreviewDocument(csv, 'csv', {
             viewColumn: ViewColumn.Two,
-            preview: true,
+            preview: false,
             preserveFocus: true,
           });
         },
@@ -95,6 +99,19 @@ export class QueryCommandProvider {
           return;
         }
       );
+  }
+
+  private async showPreviewDocument(
+    text: string,
+    languageId?: string,
+    options?: TextDocumentShowOptions
+  ) {
+    const uri = Uri.parse(`${PREVIEW_DOCUMENT_SCHEME}:${text}`);
+    const doc = await workspace.openTextDocument(uri);
+    if (languageId) {
+      languages.setTextDocumentLanguage(doc, languageId);
+    }
+    await window.showTextDocument(doc, options);
   }
 
   private async getConfigs(): Promise<ExtensionConfig | undefined> {
