@@ -20,8 +20,7 @@
     "subject",
     "body",
     "breaking",
-    "issues",
-    "lerna"
+    "issues"
   ],
   "scopes": [],
   "types": {
@@ -37,7 +36,7 @@
     },
     "docs": {
       "description": "ドキュメントの更新",
-      "emoji": "✏️",
+      "emoji": "📝",
       "value": "docs"
     },
     "feat": {
