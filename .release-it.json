@@ -10,7 +10,8 @@
     "push": false
   },
   "npm": {
-    "publish": false
+    "publish": false,
+    "ignoreVersion": true
   },
   "hooks": {
     "before:release": [
