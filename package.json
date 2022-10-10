@@ -6,6 +6,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com/Mayu-mic/vscode-athena-viewer"
   },
+  "version": "0.0.0",
   "license": "MIT",
   "private": true,
   "engines": {
