@@ -9,6 +9,8 @@ import {
   CredentialsProvider,
   WorkspaceStateCredentialsRepository,
 } from './credentials/credentials';
+import { SQLLogWorkspaceRepository } from './sql-log/sql-log-repository';
+import { SQLLogItem, SQLLogsViewProvider } from './sql-log/sql-logs-view';
 import { InputBoxConfigurationProvider } from './ui/input-box';
 import { AthenaTableViewer } from './ui/table-viewer';
 import { DatabasesViewProvider, TableItem } from './view/databases-view';
@@ -32,11 +34,15 @@ export function activate(context: vscode.ExtensionContext) {
     credentialsProvider
   );
 
+  const sqlLogsRepository = new SQLLogWorkspaceRepository(context);
+  const sqlLogsView = new SQLLogsViewProvider(sqlLogsRepository);
+
   const queryCommandProvider = new QueryCommandProvider(
     configRepository,
     configProvider,
     credentialsRepository,
-    credentialsProvider
+    credentialsProvider,
+    sqlLogsRepository
   );
   const setupConfigsCommandProvider = new SetupConfigsCommandProvider(
     configRepository,
@@ -58,7 +64,22 @@ export function activate(context: vscode.ExtensionContext) {
       'vscode-athena-viewer.refreshDatabases',
       () => databasesView.refresh()
     ),
+    vscode.commands.registerCommand('vscode-athena-viewer.refreshSQLLogs', () =>
+      sqlLogsView.refresh()
+    ),
+    vscode.commands.registerCommand('vscode-athena-viewer.clearSQLLogs', () =>
+      sqlLogsView.clear()
+    ),
+    vscode.commands.registerCommand(
+      'vscode-athena-viewer.runSQLLog',
+      (item: SQLLogItem) => queryCommandProvider.queryLogCommand(item)
+    ),
+    vscode.commands.registerCommand(
+      'vscode-athena-viewer.deleteSQLLog',
+      (item: SQLLogItem) => sqlLogsView.deleteLog(item)
+    ),
     vscode.window.registerTreeDataProvider('view-databases', databasesView),
+    vscode.window.registerTreeDataProvider('view-sql-logs', sqlLogsView),
     vscode.workspace.registerTextDocumentContentProvider(
       PREVIEW_DOCUMENT_SCHEME,
       new AthenaTableViewer()

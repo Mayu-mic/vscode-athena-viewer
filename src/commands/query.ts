@@ -1,4 +1,5 @@
 import {
+  commands,
   languages,
   ProgressLocation,
   TextDocumentShowOptions,
@@ -22,6 +23,10 @@ import { ExtensionConfig } from '../types';
 import { TableItem } from '../view/databases-view';
 import { stringify } from 'csv-stringify/sync';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
+import { ISQLLogRepository } from '../sql-log/sql-log-repository';
+import { SQLLog } from '../sql-log/sql-log';
+import { randomUUID } from 'crypto';
+import { SQLLogItem } from '../sql-log/sql-logs-view';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
@@ -30,7 +35,8 @@ export class QueryCommandProvider {
     private configRepository: IConfigurationRepository,
     private configProvider: IConfigurationProvider,
     private credentialsRepository: ICredentialsRepository,
-    private credentialsProvider: ICredentialsProvider
+    private credentialsProvider: ICredentialsProvider,
+    private sqlLogRepository: ISQLLogRepository
   ) {}
 
   async runQueryCommand() {
@@ -40,7 +46,7 @@ export class QueryCommandProvider {
       return;
     }
     const editorText = editor.document.getText();
-    await this.runQuery(editorText);
+    await this.runQuery(editorText, true);
   }
 
   async showTablesCommand(item: TableItem) {
@@ -56,7 +62,20 @@ export class QueryCommandProvider {
     await this.runQuery(sql);
   }
 
-  private async runQuery(query: string) {
+  async queryLogCommand(item: SQLLogItem) {
+    const sql = item.sqlLog.statement;
+    const doc = await workspace.openTextDocument({
+      language: 'sql',
+      content: sql,
+    });
+    await window.showTextDocument(doc, {
+      viewColumn: ViewColumn.One,
+    });
+
+    await this.runQuery(sql);
+  }
+
+  private async runQuery(query: string, addLog = false) {
     const configs = await this.getConfigs();
     if (!configs) {
       window.showErrorMessage(localeString('config-not-found'));
@@ -93,12 +112,26 @@ export class QueryCommandProvider {
             preview: false,
             preserveFocus: true,
           });
+
+          if (addLog) {
+            this.addLog(query);
+          }
         },
         (e: any) => {
           window.showErrorMessage(e.message);
           return;
         }
       );
+  }
+
+  private addLog(statement: string) {
+    const log: SQLLog = {
+      id: randomUUID(),
+      statement,
+      loggedDate: new Date(),
+    };
+    this.sqlLogRepository.add(log);
+    commands.executeCommand('vscode-athena-viewer.refreshSQLLogs');
   }
 
   private async showPreviewDocument(
