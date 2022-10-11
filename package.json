@@ -18,7 +18,8 @@
   "activationEvents": [
     "onCommand:vscode-athena-viewer.runQuery",
     "onCommand:vscode-athena-viewer.setupConfigs",
-    "onView:view-databases"
+    "onView:view-databases",
+    "onView:view-sql-logs"
   ],
   "main": "./out/src/extension.js",
   "contributes": {
@@ -35,6 +36,25 @@
         "command": "vscode-athena-viewer.refreshDatabases",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "vscode-athena-viewer.refreshSQLLogs",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vscode-athena-viewer.clearSQLLogs",
+        "title": "Clear All Logs",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "vscode-athena-viewer.runSQLLog",
+        "title": "re-run",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "vscode-athena-viewer.deleteSQLLog",
+        "title": "delete"
       },
       {
         "command": "vscode-athena-viewer.showTable",
@@ -54,6 +74,16 @@
           "command": "vscode-athena-viewer.refreshDatabases",
           "when": "view == view-databases",
           "group": "navigation"
+        },
+        {
+          "command": "vscode-athena-viewer.refreshSQLLogs",
+          "when": "view == view-sql-logs",
+          "group": "navigation"
+        },
+        {
+          "command": "vscode-athena-viewer.clearSQLLogs",
+          "when": "view == view-sql-logs",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -61,6 +91,15 @@
           "command": "vscode-athena-viewer.showTable",
           "when": "view == view-databases && viewItem == table",
           "group": "inline"
+        },
+        {
+          "command": "vscode-athena-viewer.runSQLLog",
+          "when": "view == view-sql-logs && viewItem == sql-log",
+          "group": "inline"
+        },
+        {
+          "command": "vscode-athena-viewer.deleteSQLLog",
+          "when": "view == view-sql-logs && viewItem == sql-log"
         }
       ]
     },
@@ -69,6 +108,10 @@
         {
           "id": "view-databases",
           "name": "Databases"
+        },
+        {
+          "id": "view-sql-logs",
+          "name": "Logs"
         }
       ]
     },
