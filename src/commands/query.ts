@@ -20,13 +20,11 @@ import {
 import { getCredentialProfiles } from '../credentials/get-profiles';
 import { localeString } from '../i18n';
 import { ExtensionConfig } from '../types';
-import { TableItem } from '../view/databases-view';
 import { stringify } from 'csv-stringify/sync';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
 import { ISQLLogRepository } from '../sql-log/sql-log-repository';
 import { SQLLog } from '../sql-log/sql-log';
 import { randomUUID } from 'crypto';
-import { SQLLogItem } from '../sql-log/sql-logs-view';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
@@ -49,8 +47,8 @@ export class QueryCommandProvider {
     await this.runQuery(editorText, true);
   }
 
-  async showTablesCommand(item: TableItem) {
-    const sql = `select * from "${item.parentDatabase}"."${item.name}" limit ${this.DEFAULT_PREVIEW_LIMIT};`;
+  async showTablesCommand(database: string, table: string) {
+    const sql = `select * from "${database}"."${table}" limit ${this.DEFAULT_PREVIEW_LIMIT};`;
     const doc = await workspace.openTextDocument({
       language: 'sql',
       content: sql,
@@ -62,8 +60,8 @@ export class QueryCommandProvider {
     await this.runQuery(sql);
   }
 
-  async queryLogCommand(item: SQLLogItem) {
-    const sql = item.sqlLog.statement;
+  async queryLogCommand(sqlLog: SQLLog) {
+    const sql = sqlLog.statement;
     const doc = await workspace.openTextDocument({
       language: 'sql',
       content: sql,

@@ -55,7 +55,8 @@ export function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand(
       'vscode-athena-viewer.showTable',
-      (item: TableItem) => queryCommandProvider.showTablesCommand(item)
+      (item: TableItem) =>
+        queryCommandProvider.showTablesCommand(item.parentDatabase, item.name)
     ),
     vscode.commands.registerCommand('vscode-athena-viewer.setupConfigs', () =>
       setupConfigsCommandProvider.setupConfigsCommand()
@@ -72,11 +73,11 @@ export function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand(
       'vscode-athena-viewer.runSQLLog',
-      (item: SQLLogItem) => queryCommandProvider.queryLogCommand(item)
+      (item: SQLLogItem) => queryCommandProvider.queryLogCommand(item.sqlLog)
     ),
     vscode.commands.registerCommand(
       'vscode-athena-viewer.deleteSQLLog',
-      (item: SQLLogItem) => sqlLogsView.deleteLog(item)
+      (item: SQLLogItem) => sqlLogsView.deleteLog(item.sqlLog)
     ),
     vscode.window.registerTreeDataProvider('view-databases', databasesView),
     vscode.window.registerTreeDataProvider('view-sql-logs', sqlLogsView),
