@@ -37,8 +37,8 @@ export class SQLLogsViewProvider implements TreeDataProvider<SQLLogItem> {
     this.refresh();
   }
 
-  deleteLog(item: SQLLogItem) {
-    const id = item.sqlLog.id;
+  deleteLog(sqlLog: SQLLog) {
+    const id = sqlLog.id;
     this.sqlLogsRepository.delete(id);
     this.refresh();
   }
