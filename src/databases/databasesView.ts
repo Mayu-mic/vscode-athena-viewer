@@ -10,7 +10,7 @@ import {
 import { AthenaClientWrapper } from '../athena';
 import { ConfigurationRepository } from '../config/configRepository';
 import { CredentialsRepository } from '../credentials/credentialsRepository';
-import { CredentialsProvider } from '../credentials/CredentialsProvider';
+import { CredentialsProvider } from '../credentials/credentialsProvider';
 import { localeString } from '../i18n';
 
 export class DatabasesViewProvider
