@@ -11,7 +11,7 @@ import { SQLLogWorkspaceRepository } from './sqlLog/sqlLogRepository';
 import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
 import { InputBoxConfigurationProvider } from './config/inputBoxConfigurationProvider';
 import { AthenaTableViewer } from './ui/tableViewer';
-import { DatabasesViewProvider, TableItem } from './view/databasesView';
+import { DatabasesViewProvider, TableItem } from './databases/databasesView';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

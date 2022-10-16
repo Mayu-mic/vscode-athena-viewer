@@ -22,12 +22,8 @@ export class DatabasesViewProvider
     private credentialsProvider: CredentialsProvider
   ) {}
 
-  private _onDidChangeTreeData: EventEmitter<
-    DependencyElement | undefined | null | void
-  > = new EventEmitter();
-  readonly onDidChangeTreeData: Event<
-    DependencyElement | undefined | null | void
-  > = this._onDidChangeTreeData.event;
+  private _onDidChangeTreeData: EventEmitter<void> = new EventEmitter();
+  readonly onDidChangeTreeData: Event<void> = this._onDidChangeTreeData.event;
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
