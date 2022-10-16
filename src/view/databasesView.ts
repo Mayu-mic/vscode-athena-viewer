@@ -5,21 +5,21 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
+  window,
 } from 'vscode';
 import { AthenaClientWrapper } from '../athena';
-import { IConfigurationRepository } from '../config/config-repository';
-import {
-  ICredentialsProvider,
-  ICredentialsRepository,
-} from '../credentials/credentials';
+import { ConfigurationRepository } from '../config/configRepository';
+import { CredentialsRepository } from '../credentials/credentialsRepository';
+import { CredentialsProvider } from '../credentials/CredentialsProvider';
+import { localeString } from '../i18n';
 
 export class DatabasesViewProvider
   implements TreeDataProvider<DependencyElement>
 {
   constructor(
-    private configRepository: IConfigurationRepository,
-    private credentialsRepository: ICredentialsRepository,
-    private credentialsProvider: ICredentialsProvider
+    private configRepository: ConfigurationRepository,
+    private credentialsRepository: CredentialsRepository,
+    private credentialsProvider: CredentialsProvider
   ) {}
 
   private _onDidChangeTreeData: EventEmitter<
@@ -51,7 +51,7 @@ export class DatabasesViewProvider
 
   private async getDataCatalogs(): Promise<DataCatalogItem[]> {
     const client = await this.getClient();
-    const dataCatalogs = await client.getDataCatalogs();
+    const dataCatalogs = await client?.getDataCatalogs();
     if (dataCatalogs) {
       return dataCatalogs
         .filter((d) => d.CatalogName)
@@ -69,17 +69,21 @@ export class DatabasesViewProvider
 
   private async getDatabases(dataCatalog: string): Promise<DatabaseItem[]> {
     const client = await this.getClient();
-    const databases = await client.getDatabases(dataCatalog);
-    return databases
-      .filter((d) => d.Name)
-      .map(
-        (database) =>
-          new DatabaseItem(
-            database.Name!,
-            dataCatalog,
-            TreeItemCollapsibleState.Collapsed
-          )
-      );
+    const databases = await client?.getDatabases(dataCatalog);
+    if (databases) {
+      return databases
+        .filter((d) => d.Name)
+        .map(
+          (database) =>
+            new DatabaseItem(
+              database.Name!,
+              dataCatalog,
+              TreeItemCollapsibleState.Collapsed
+            )
+        );
+    } else {
+      return [];
+    }
   }
 
   private async getTables(
@@ -87,7 +91,7 @@ export class DatabasesViewProvider
     database: string
   ): Promise<TableItem[]> {
     const client = await this.getClient();
-    const tables = await client.getTables(dataCatalog, database);
+    const tables = await client?.getTables(dataCatalog, database);
     if (tables) {
       return tables
         .filter((t) => t.Name)
@@ -105,18 +109,19 @@ export class DatabasesViewProvider
     }
   }
 
-  private async getClient(): Promise<AthenaClientWrapper> {
-    const profile = this.configRepository.getProfile();
-    if (!profile) {
-      throw new Error('profile is not set.');
+  private async getClient(): Promise<AthenaClientWrapper | undefined> {
+    const configs = await this.configRepository.getConfig();
+    if (!configs) {
+      window.showErrorMessage(localeString('config-not-found'));
+      return;
     }
-    const region = this.configRepository.getRegion();
-    if (!region) {
-      throw new Error('region is not set.');
-    }
+    const { profile, region } = configs;
     let credentials = this.credentialsRepository.getCredentials(profile);
     if (!credentials) {
       credentials = await this.credentialsProvider.provideCredentials(profile);
+      if (!credentials) {
+        return;
+      }
       this.credentialsRepository.setCredentials(profile, credentials);
     }
     return new AthenaClientWrapper(region, credentials);

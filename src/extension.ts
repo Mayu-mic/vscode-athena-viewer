@@ -2,18 +2,16 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { QueryCommandProvider } from './commands/query';
-import { SetupConfigsCommandProvider } from './commands/setup-configs';
-import { WorkspaceStateConfigRepository } from './config/config-repository';
+import { SetupConfigsCommandProvider } from './commands/setupConfigs';
+import { WorkspaceStateConfigRepository } from './config/configRepository';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
-import {
-  CredentialsProvider,
-  WorkspaceStateCredentialsRepository,
-} from './credentials/credentials';
-import { SQLLogWorkspaceRepository } from './sql-log/sql-log-repository';
-import { SQLLogItem, SQLLogsViewProvider } from './sql-log/sql-logs-view';
-import { InputBoxConfigurationProvider } from './ui/input-box';
-import { AthenaTableViewer } from './ui/table-viewer';
-import { DatabasesViewProvider, TableItem } from './view/databases-view';
+import { WorkspaceStateCredentialsRepository } from './credentials/credentialsRepository';
+import { AWSCredentialsProvider } from './credentials/credentialsProvider';
+import { SQLLogWorkspaceRepository } from './sqlLog/sqlLogRepository';
+import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
+import { InputBoxConfigurationProvider } from './config/inputBoxConfigurationProvider';
+import { AthenaTableViewer } from './ui/tableViewer';
+import { DatabasesViewProvider, TableItem } from './view/databasesView';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -27,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
   const credentialsRepository = new WorkspaceStateCredentialsRepository(
     context
   );
-  const credentialsProvider = new CredentialsProvider();
+  const credentialsProvider = new AWSCredentialsProvider();
   const databasesView = new DatabasesViewProvider(
     configRepository,
     credentialsRepository,
@@ -39,7 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   const queryCommandProvider = new QueryCommandProvider(
     configRepository,
-    configProvider,
     credentialsRepository,
     credentialsProvider,
     sqlLogsRepository

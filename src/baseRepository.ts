@@ -7,11 +7,15 @@ export abstract class WorkspaceStateRepository {
     this.state = ctx.workspaceState;
   }
 
-  protected getConfig<T>(key: string): T | undefined {
+  protected get<T>(key: string): T | undefined {
     return this.state.get<T>(key);
   }
 
-  protected setConfig<T>(key: string, value: T): void {
+  protected set<T>(key: string, value: T): void {
     this.state.update(key, value);
+  }
+
+  protected delete(key: string): void {
+    this.state.update(key, undefined);
   }
 }

@@ -1,50 +1,24 @@
+import * as AWS from '@aws-sdk/types';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { fromIni } from '@aws-sdk/credential-provider-ini';
 import { AssumeRoleParams } from '@aws-sdk/credential-provider-ini/dist-types/resolveAssumeRoleCredentials';
-import * as AWS from '@aws-sdk/types';
 import { localeString } from '../i18n';
 import { window } from 'vscode';
-import { WorkspaceStateRepository } from '../base-repository';
 
-export interface ICredentialsProvider {
-  provideCredentials(profile: string): Promise<AWS.Credentials>;
+export interface CredentialsProvider {
+  provideCredentials(profile: string): Promise<AWS.Credentials | undefined>;
 }
 
-export interface ICredentialsRepository {
-  getCredentials(profile: string): AWS.Credentials | undefined;
-  setCredentials(profile: string, credentials: AWS.Credentials): void;
-}
-
-export class WorkspaceStateCredentialsRepository
-  extends WorkspaceStateRepository
-  implements ICredentialsRepository
-{
-  getCredentials(profile: string): AWS.Credentials | undefined {
-    const key = this.getKey(profile);
-    const credentials = this.getConfig<AWS.Credentials>(key);
-
-    if (
-      credentials &&
-      credentials.expiration &&
-      new Date() < new Date(Date.parse(credentials.expiration.toString()))
-    ) {
-      return credentials;
+export class AWSCredentialsProvider implements CredentialsProvider {
+  async provideCredentials(
+    profile: string
+  ): Promise<AWS.Credentials | undefined> {
+    try {
+      return await this.getCredentialsFromIni(profile);
+    } catch (error) {
+      window.showErrorMessage(localeString('mfa-code-not-found'));
+      return undefined;
     }
-  }
-
-  setCredentials(profile: string, credentials: AWS.Credentials): void {
-    const key = this.getKey(profile);
-    this.setConfig(key, credentials);
-  }
-
-  private getKey(profile: string): string {
-    return `credentials:${profile}`;
-  }
-}
-
-export class CredentialsProvider implements ICredentialsProvider {
-  async provideCredentials(profile: string): Promise<AWS.Credentials> {
-    return await this.getCredentialsFromIni(profile);
   }
 
   private async getCredentialsFromIni(
@@ -84,7 +58,7 @@ export class CredentialsProvider implements ICredentialsProvider {
     });
 
     if (!token) {
-      throw new Error(localeString('mfa-code-not-found'));
+      throw new Error('MFA token is required');
     }
 
     return token;

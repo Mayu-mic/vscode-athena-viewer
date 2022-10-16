@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { IConfigurationProvider } from '../config/config-repository';
+import { ConfigurationProvider } from './configurationProvider';
 
-export class InputBoxConfigurationProvider implements IConfigurationProvider {
+export class InputBoxConfigurationProvider implements ConfigurationProvider {
   async provideProfile(candidates: string[]): Promise<string | undefined> {
     return await vscode.window.showQuickPick(candidates, {
       title: 'AWS Profile?',

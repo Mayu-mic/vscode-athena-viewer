@@ -1,6 +1,6 @@
 import { ExtensionContext } from 'vscode';
-import { WorkspaceStateRepository } from '../base-repository';
-import { SQLLog, SQLLogJson } from './sql-log';
+import { WorkspaceStateRepository } from '../baseRepository';
+import { SQLLog, SQLLogJson } from './sqlLog';
 
 export interface ISQLLogRepository {
   add(sqlLog: SQLLog): void;
@@ -40,7 +40,7 @@ export class SQLLogWorkspaceRepository
   }
 
   private getSQLLogs(): SQLLog[] {
-    const logs = this.getConfig<SQLLogJson[]>(this.KEY) ?? [];
+    const logs = this.get<SQLLogJson[]>(this.KEY) ?? [];
     return logs.map((log) => ({
       ...log,
       loggedDate: new Date(log.loggedDate),
@@ -52,6 +52,6 @@ export class SQLLogWorkspaceRepository
       ...log,
       loggedDate: log.loggedDate.getTime(),
     }));
-    this.setConfig<SQLLogJson[]>(this.KEY, json);
+    this.set<SQLLogJson[]>(this.KEY, json);
   }
 }

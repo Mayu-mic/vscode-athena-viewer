@@ -1,15 +1,13 @@
 import { window } from 'vscode';
-import {
-  IConfigurationProvider,
-  IConfigurationRepository,
-} from '../config/config-repository';
-import { getCredentialProfiles } from '../credentials/get-profiles';
-import { ExtensionConfig } from '../types';
+import { Configuration } from '../config/config';
+import { ConfigurationRepository } from '../config/configRepository';
+import { ConfigurationProvider } from '../config/configurationProvider';
+import { getCredentialProfiles } from '../credentials/getCredentialProfiles';
 
 export class SetupConfigsCommandProvider {
   constructor(
-    private configRepository: IConfigurationRepository,
-    private configProvider: IConfigurationProvider
+    private configRepository: ConfigurationRepository,
+    private configProvider: ConfigurationProvider
   ) {}
 
   async setupConfigsCommand() {
@@ -20,26 +18,26 @@ export class SetupConfigsCommandProvider {
     window.showInformationMessage('Configuration updated!');
   }
 
-  private async setConfigs(): Promise<ExtensionConfig | undefined> {
+  private async setConfigs(): Promise<Configuration | undefined> {
     const profiles = await getCredentialProfiles();
     const profile = await this.configProvider.provideProfile(profiles);
     if (!profile) {
       return;
     }
-    this.configRepository.setProfile(profile);
-
     const region = await this.configProvider.provideRegion();
     if (!region) {
       return;
     }
-    this.configRepository.setRegion(region);
-
     const workgroup = await this.configProvider.provideWorkgroup();
     if (!workgroup) {
       return;
     }
-    this.configRepository.setWorkgroup(workgroup);
-
-    return { profile, region, workgroup };
+    const config: Configuration = {
+      profile,
+      region,
+      workgroup,
+    };
+    await this.configRepository.setConfig(config);
+    return config;
   }
 }
