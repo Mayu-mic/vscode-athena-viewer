@@ -1,6 +1,5 @@
 import {
   CancellationToken,
-  Event,
   ProviderResult,
   TextDocumentContentProvider,
   Uri,
