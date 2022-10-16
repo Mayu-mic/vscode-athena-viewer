@@ -11,7 +11,7 @@ import {
 import { AthenaClientWrapper, QueryResult } from '../athena';
 import { ConfigurationRepository } from '../config/configRepository';
 import { CredentialsRepository } from '../credentials/credentialsRepository';
-import { CredentialsProvider } from '../credentials/CredentialsProvider';
+import { CredentialsProvider } from '../credentials/credentialsProvider';
 import { localeString } from '../i18n';
 import { stringify } from 'csv-stringify/sync';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
