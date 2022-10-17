@@ -1,4 +1,4 @@
-import { window } from 'vscode';
+import { Event, EventEmitter, window } from 'vscode';
 import { Configuration } from '../config/config';
 import { ConfigurationRepository } from '../config/configRepository';
 import { ConfigurationProvider } from '../config/configurationProvider';
@@ -9,6 +9,10 @@ export class SetupConfigsCommandProvider {
     private configRepository: ConfigurationRepository,
     private configProvider: ConfigurationProvider
   ) {}
+
+  private _onChangeProfileStatus: EventEmitter<void> = new EventEmitter();
+  readonly onChangeProfileStatus: Event<void> =
+    this._onChangeProfileStatus.event;
 
   async setupConfigsCommand() {
     const result = await this.setConfigs();
@@ -37,7 +41,8 @@ export class SetupConfigsCommandProvider {
       region,
       workgroup,
     };
-    await this.configRepository.setConfig(config);
+    this.configRepository.setConfig(config);
+    this._onChangeProfileStatus.fire();
     return config;
   }
 }

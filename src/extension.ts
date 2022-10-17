@@ -12,6 +12,7 @@ import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
 import { InputBoxConfigurationProvider } from './config/inputBoxConfigurationProvider';
 import { AthenaTableViewer } from './ui/tableViewer';
 import { DatabasesViewProvider, TableItem } from './databases/databasesView';
+import { ProfileStatusViewProvider } from './config/profileStatusView';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -45,6 +46,12 @@ export function activate(context: vscode.ExtensionContext) {
     configRepository,
     configProvider
   );
+  const profileStatusViewProvider = new ProfileStatusViewProvider(
+    configRepository
+  );
+  setupConfigsCommandProvider.onChangeProfileStatus(() => {
+    profileStatusViewProvider.refresh();
+  });
 
   const disposables = [
     vscode.commands.registerCommand('vscode-athena-viewer.runQuery', () =>
@@ -82,6 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
       PREVIEW_DOCUMENT_SCHEME,
       new AthenaTableViewer()
     ),
+    profileStatusViewProvider.provide(),
   ];
 
   disposables.forEach((disposable) => context.subscriptions.push(disposable));

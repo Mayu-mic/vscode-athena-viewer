@@ -66,7 +66,7 @@ export class QueryCommandProvider {
   }
 
   private async runQuery(query: string, addLog = false) {
-    const configs = await this.configRepository.getConfig();
+    const configs = this.configRepository.getConfig();
     if (!configs) {
       window.showErrorMessage(localeString('config-not-found'));
       return;

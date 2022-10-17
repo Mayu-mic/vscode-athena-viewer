@@ -106,7 +106,7 @@ export class DatabasesViewProvider
   }
 
   private async getClient(): Promise<AthenaClientWrapper | undefined> {
-    const configs = await this.configRepository.getConfig();
+    const configs = this.configRepository.getConfig();
     if (!configs) {
       window.showErrorMessage(localeString('config-not-found'));
       return;
