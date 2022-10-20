@@ -9,7 +9,6 @@ import {
   workspace,
 } from 'vscode';
 import { AthenaClientWrapper, QueryResult } from '../athena';
-import { ConfigurationRepository } from '../config/configRepository';
 import { CredentialsRepository } from '../credentials/credentialsRepository';
 import { CredentialsProvider } from '../credentials/credentialsProvider';
 import { localeString } from '../i18n';
@@ -18,12 +17,15 @@ import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
 import { ISQLLogRepository } from '../sqlLog/sqlLogRepository';
 import { SQLLog } from '../sqlLog/sqlLog';
 import { randomUUID } from 'crypto';
+import { ProfileRepository } from '../profile/profileRepository';
+import { ConnectionRepository } from '../connection/connectionRepository';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
 
   constructor(
-    private configRepository: ConfigurationRepository,
+    private connectionsRepository: ConnectionRepository,
+    private profileRespository: ProfileRepository,
     private credentialsRepository: CredentialsRepository,
     private credentialsProvider: CredentialsProvider,
     private sqlLogRepository: ISQLLogRepository
@@ -66,19 +68,25 @@ export class QueryCommandProvider {
   }
 
   private async runQuery(query: string, addLog = false) {
-    const configs = await this.configRepository.getConfig();
-    if (!configs) {
-      window.showErrorMessage(localeString('config-not-found'));
+    const profile = this.profileRespository.getProfile();
+    if (!profile) {
+      window.showErrorMessage(localeString('profile-not-found'));
       return;
     }
-    const { profile, region, workgroup } = configs;
-    let credentials = this.credentialsRepository.getCredentials(profile);
+    const connection = this.connectionsRepository.getConnection();
+    if (!connection) {
+      window.showErrorMessage(localeString('connection-not-found'));
+      return;
+    }
+    let credentials = this.credentialsRepository.getCredentials(profile.id);
     if (!credentials) {
-      credentials = await this.credentialsProvider.provideCredentials(profile);
+      credentials = await this.credentialsProvider.provideCredentials(
+        profile.id
+      );
       if (!credentials) {
         return;
       }
-      this.credentialsRepository.setCredentials(profile, credentials);
+      this.credentialsRepository.setCredentials(profile.id, credentials);
     }
 
     let result: QueryResult;
@@ -89,8 +97,11 @@ export class QueryCommandProvider {
           location: ProgressLocation.Notification,
         },
         async () => {
-          const client = new AthenaClientWrapper(region, credentials!);
-          result = await client.runQuery(query, workgroup);
+          const client = new AthenaClientWrapper(
+            connection.region.id,
+            credentials!
+          );
+          result = await client.runQuery(query, connection.workgroup);
         }
       )
       .then(

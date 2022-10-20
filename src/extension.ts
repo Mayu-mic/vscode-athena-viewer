@@ -2,16 +2,25 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { QueryCommandProvider } from './commands/query';
-import { SetupConfigsCommandProvider } from './commands/setupConfigs';
-import { WorkspaceStateConfigRepository } from './config/configRepository';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
 import { WorkspaceStateCredentialsRepository } from './credentials/credentialsRepository';
 import { AWSCredentialsProvider } from './credentials/credentialsProvider';
 import { SQLLogWorkspaceRepository } from './sqlLog/sqlLogRepository';
 import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
-import { InputBoxConfigurationProvider } from './config/inputBoxConfigurationProvider';
 import { AthenaTableViewer } from './ui/tableViewer';
-import { DatabasesViewProvider, TableItem } from './databases/databasesView';
+import { ProfileStatusViewProvider } from './profile/profileStatusView';
+import {
+  ConnectionsViewProvider,
+  TableItem,
+} from './connection/connectionView';
+import { WorkspaceStateConnectionRepository } from './connection/connectionRepository';
+import { QuickPickRegionProvider } from './connection/regionProvider';
+import { SwitchRegionCommandProvider } from './commands/switchRegion';
+import { SwitchProfileCommandProvider } from './commands/switchProfile';
+import { WorkspaceStateProfileRepository } from './profile/profileRepository';
+import { InputBoxProfileProvider } from './profile/profileProvider';
+import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
+import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -20,14 +29,15 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
 
-  const configRepository = new WorkspaceStateConfigRepository(context);
-  const configProvider = new InputBoxConfigurationProvider();
+  const connectionRepository = new WorkspaceStateConnectionRepository(context);
+  const profileRepository = new WorkspaceStateProfileRepository(context);
   const credentialsRepository = new WorkspaceStateCredentialsRepository(
     context
   );
   const credentialsProvider = new AWSCredentialsProvider();
-  const databasesView = new DatabasesViewProvider(
-    configRepository,
+  const connectionView = new ConnectionsViewProvider(
+    connectionRepository,
+    profileRepository,
     credentialsRepository,
     credentialsProvider
   );
@@ -36,14 +46,34 @@ export function activate(context: vscode.ExtensionContext) {
   const sqlLogsView = new SQLLogsViewProvider(sqlLogsRepository);
 
   const queryCommandProvider = new QueryCommandProvider(
-    configRepository,
+    connectionRepository,
+    profileRepository,
     credentialsRepository,
     credentialsProvider,
     sqlLogsRepository
   );
-  const setupConfigsCommandProvider = new SetupConfigsCommandProvider(
-    configRepository,
-    configProvider
+
+  const profileProvider = new InputBoxProfileProvider();
+  const switchProfileCommandProvider = new SwitchProfileCommandProvider(
+    profileRepository,
+    profileProvider
+  );
+  const profileStatusViewProvider = new ProfileStatusViewProvider(
+    profileRepository
+  );
+  switchProfileCommandProvider.onChangeProfileStatus(() => {
+    profileStatusViewProvider.refresh();
+  });
+  const regionsProvider = new QuickPickRegionProvider();
+  const switchRegionCommandProvider = new SwitchRegionCommandProvider(
+    connectionRepository,
+    regionsProvider
+  );
+
+  const workgroupProvider = new InputBoxWorkgroupProvider(connectionRepository);
+  const inputWorkgroupCommandProvider = new InputWorkgroupCommandProvider(
+    workgroupProvider,
+    connectionRepository
   );
 
   const disposables = [
@@ -53,14 +83,23 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       'vscode-athena-viewer.showTable',
       (item: TableItem) =>
-        queryCommandProvider.showTablesCommand(item.parentDatabase, item.name)
+        queryCommandProvider.showTablesCommand(
+          item.parent.database.Name!,
+          item.table.Name!
+        )
     ),
-    vscode.commands.registerCommand('vscode-athena-viewer.setupConfigs', () =>
-      setupConfigsCommandProvider.setupConfigsCommand()
+    vscode.commands.registerCommand('vscode-athena-viewer.switchProfile', () =>
+      switchProfileCommandProvider.switchProfileCommand()
+    ),
+    vscode.commands.registerCommand('vscode-athena-viewer.switchRegion', () =>
+      switchRegionCommandProvider.switchRegionCommand()
+    ),
+    vscode.commands.registerCommand('vscode-athena-viewer.inputWorkgroup', () =>
+      inputWorkgroupCommandProvider.inputWorkgroupCommand()
     ),
     vscode.commands.registerCommand(
-      'vscode-athena-viewer.refreshDatabases',
-      () => databasesView.refresh()
+      'vscode-athena-viewer.refreshConnection',
+      () => connectionView.refresh()
     ),
     vscode.commands.registerCommand('vscode-athena-viewer.refreshSQLLogs', () =>
       sqlLogsView.refresh()
@@ -76,12 +115,13 @@ export function activate(context: vscode.ExtensionContext) {
       'vscode-athena-viewer.deleteSQLLog',
       (item: SQLLogItem) => sqlLogsView.deleteLog(item.sqlLog)
     ),
-    vscode.window.registerTreeDataProvider('view-databases', databasesView),
+    vscode.window.registerTreeDataProvider('view-connection', connectionView),
     vscode.window.registerTreeDataProvider('view-sql-logs', sqlLogsView),
     vscode.workspace.registerTextDocumentContentProvider(
       PREVIEW_DOCUMENT_SCHEME,
       new AthenaTableViewer()
     ),
+    profileStatusViewProvider.provide(),
   ];
 
   disposables.forEach((disposable) => context.subscriptions.push(disposable));

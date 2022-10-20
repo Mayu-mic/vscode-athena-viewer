@@ -17,8 +17,9 @@
   ],
   "activationEvents": [
     "onCommand:vscode-athena-viewer.runQuery",
-    "onCommand:vscode-athena-viewer.setupConfigs",
-    "onView:view-databases",
+    "onCommand:vscode-athena-viewer.switchRegion",
+    "onCommand:vscode-athena-viewer.switchProfile",
+    "onView:view-connection",
     "onView:view-sql-logs"
   ],
   "main": "./out/src/extension.js",
@@ -29,11 +30,19 @@
         "title": "%run-query-command-title%"
       },
       {
-        "command": "vscode-athena-viewer.setupConfigs",
-        "title": "%setup-configs-title%"
+        "command": "vscode-athena-viewer.switchRegion",
+        "title": "%switch-region-title%"
       },
       {
-        "command": "vscode-athena-viewer.refreshDatabases",
+        "command": "vscode-athena-viewer.switchProfile",
+        "title": "%switch-profile-title%"
+      },
+      {
+        "command": "vscode-athena-viewer.inputWorkgroup",
+        "title": "%input-workgroup-title%"
+      },
+      {
+        "command": "vscode-athena-viewer.refreshConnection",
         "title": "Refresh",
         "icon": "$(refresh)"
       },
@@ -62,6 +71,13 @@
         "icon": "$(eye)"
       }
     ],
+    "submenus": [
+      {
+        "id": "databases.submenu",
+        "label": "menu",
+        "icon": "$(more)"
+      }
+    ],
     "menus": {
       "commandPalette": [
         {
@@ -69,11 +85,33 @@
           "when": "editorLangId == sql"
         }
       ],
+      "databases.submenu": [
+        {
+          "command": "vscode-athena-viewer.switchProfile",
+          "when": "view == view-connection",
+          "group": "navigation@1"
+        },
+        {
+          "command": "vscode-athena-viewer.switchRegion",
+          "when": "view == view-connection",
+          "group": "navigation@2"
+        },
+        {
+          "command": "vscode-athena-viewer.inputWorkgroup",
+          "when": "view == view-connection",
+          "group": "navigation@3"
+        }
+      ],
       "view/title": [
         {
-          "command": "vscode-athena-viewer.refreshDatabases",
-          "when": "view == view-databases",
-          "group": "navigation"
+          "command": "vscode-athena-viewer.refreshConnection",
+          "when": "view == view-connection",
+          "group": "navigation@1"
+        },
+        {
+          "submenu": "databases.submenu",
+          "when": "view == view-connection",
+          "group": "navigation@2"
         },
         {
           "command": "vscode-athena-viewer.refreshSQLLogs",
@@ -88,8 +126,12 @@
       ],
       "view/item/context": [
         {
+          "command": "vscode-athena-viewer.inputWorkgroup",
+          "when": "view == view-connection && viewItem == connection"
+        },
+        {
           "command": "vscode-athena-viewer.showTable",
-          "when": "view == view-databases && viewItem == table",
+          "when": "view == view-connection && viewItem == table",
           "group": "inline"
         },
         {
@@ -106,7 +148,7 @@
     "views": {
       "vscode-athena-viewer-view": [
         {
-          "id": "view-databases",
+          "id": "view-connection",
           "name": "Databases"
         },
         {
@@ -126,8 +168,8 @@
     },
     "viewsWelcome": [
       {
-        "view": "view-databases",
-        "contents": "No configuration found.\n[Setup Configs](command:vscode-athena-viewer.setupConfigs)"
+        "view": "view-connection",
+        "contents": "No connecion found.\n[Setup Region](command:vscode-athena-viewer.swtichRegion)\n[Setup Profile](command:vscode-athena-viewer.switchProfile)"
       }
     ]
   },
