@@ -87,14 +87,19 @@
       ],
       "databases.submenu": [
         {
+          "command": "vscode-athena-viewer.switchProfile",
+          "when": "view == view-connection",
+          "group": "navigation@1"
+        },
+        {
           "command": "vscode-athena-viewer.switchRegion",
           "when": "view == view-connection",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "command": "vscode-athena-viewer.inputWorkgroup",
           "when": "view == view-connection",
-          "group": "navigation"
+          "group": "navigation@3"
         }
       ],
       "view/title": [
