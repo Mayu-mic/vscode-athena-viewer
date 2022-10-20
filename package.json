@@ -38,6 +38,10 @@
         "title": "%switch-profile-title%"
       },
       {
+        "command": "vscode-athena-viewer.inputWorkgroup",
+        "title": "%input-workgroup-title%"
+      },
+      {
         "command": "vscode-athena-viewer.refreshConnection",
         "title": "Refresh",
         "icon": "$(refresh)"
@@ -86,6 +90,11 @@
           "command": "vscode-athena-viewer.switchRegion",
           "when": "view == view-connection",
           "group": "navigation"
+        },
+        {
+          "command": "vscode-athena-viewer.inputWorkgroup",
+          "when": "view == view-connection",
+          "group": "navigation"
         }
       ],
       "view/title": [
@@ -111,6 +120,10 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "vscode-athena-viewer.inputWorkgroup",
+          "when": "view == view-connection && viewItem == connection"
+        },
         {
           "command": "vscode-athena-viewer.showTable",
           "when": "view == view-connection && viewItem == table",

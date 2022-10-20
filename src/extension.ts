@@ -19,6 +19,8 @@ import { SwitchRegionCommandProvider } from './commands/switchRegion';
 import { SwitchProfileCommandProvider } from './commands/switchProfile';
 import { WorkspaceStateProfileRepository } from './profile/profileRepository';
 import { InputBoxProfileProvider } from './profile/profileProvider';
+import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
+import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -27,14 +29,14 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
 
-  const connectionsRepository = new WorkspaceStateConnectionRepository(context);
+  const connectionRepository = new WorkspaceStateConnectionRepository(context);
   const profileRepository = new WorkspaceStateProfileRepository(context);
   const credentialsRepository = new WorkspaceStateCredentialsRepository(
     context
   );
   const credentialsProvider = new AWSCredentialsProvider();
   const connectionView = new ConnectionsViewProvider(
-    connectionsRepository,
+    connectionRepository,
     profileRepository,
     credentialsRepository,
     credentialsProvider
@@ -44,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
   const sqlLogsView = new SQLLogsViewProvider(sqlLogsRepository);
 
   const queryCommandProvider = new QueryCommandProvider(
-    connectionsRepository,
+    connectionRepository,
     profileRepository,
     credentialsRepository,
     credentialsProvider,
@@ -64,8 +66,14 @@ export function activate(context: vscode.ExtensionContext) {
   });
   const regionsProvider = new QuickPickRegionProvider();
   const switchRegionCommandProvider = new SwitchRegionCommandProvider(
-    connectionsRepository,
+    connectionRepository,
     regionsProvider
+  );
+
+  const workgroupProvider = new InputBoxWorkgroupProvider(connectionRepository);
+  const inputWorkgroupCommandProvider = new InputWorkgroupCommandProvider(
+    workgroupProvider,
+    connectionRepository
   );
 
   const disposables = [
@@ -85,6 +93,9 @@ export function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand('vscode-athena-viewer.switchRegion', () =>
       switchRegionCommandProvider.switchRegionCommand()
+    ),
+    vscode.commands.registerCommand('vscode-athena-viewer.inputWorkgroup', () =>
+      inputWorkgroupCommandProvider.inputWorkgroupCommand()
     ),
     vscode.commands.registerCommand(
       'vscode-athena-viewer.refreshConnection',
