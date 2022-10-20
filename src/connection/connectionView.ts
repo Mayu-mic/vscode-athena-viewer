@@ -164,7 +164,7 @@ class ConnectionItem extends DependencyElement {
   ) {
     super(connection.region.label, collapsibleState);
     this.contextValue = 'connection';
-    this.description = connection.workgroup;
+    this.description = `workgroup: ${connection.workgroup}`;
     this.label = connection.region.label;
   }
 }
