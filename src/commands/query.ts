@@ -19,6 +19,7 @@ import { SQLLog } from '../sqlLog/sqlLog';
 import { randomUUID } from 'crypto';
 import { ProfileRepository } from '../profile/profileRepository';
 import { ConnectionRepository } from '../connection/connectionRepository';
+import { StatisticsOutputChannel } from '../output/statisticsOutputChannel';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
@@ -28,7 +29,8 @@ export class QueryCommandProvider {
     private profileRespository: ProfileRepository,
     private credentialsRepository: CredentialsRepository,
     private credentialsProvider: CredentialsProvider,
-    private sqlLogRepository: ISQLLogRepository
+    private sqlLogRepository: ISQLLogRepository,
+    private statisticsOutputChannel: StatisticsOutputChannel
   ) {}
 
   async runQueryCommand() {
@@ -113,6 +115,7 @@ export class QueryCommandProvider {
           const table = [result.columns, ...result.rows];
           const csv = stringify(table, { quoted_string: true });
 
+          this.showStatistics(result);
           await this.showPreviewDocument(csv, 'csv', {
             viewColumn: ViewColumn.Two,
             preview: false,
@@ -138,6 +141,19 @@ export class QueryCommandProvider {
     };
     this.sqlLogRepository.add(log);
     commands.executeCommand('vscode-athena-viewer.refreshSQLLogs');
+  }
+
+  private showStatistics(result: QueryResult) {
+    this.statisticsOutputChannel.clear();
+    if (result.statistics) {
+      this.statisticsOutputChannel.outputStatistics({
+        outputLines: result.rows.length,
+        dataScannedInBytes: result.statistics.DataScannedInBytes ?? 0,
+        totalExecutionTime: result.statistics.TotalExecutionTimeInMillis ?? 0,
+        queryQueueTime: result.statistics.QueryQueueTimeInMillis ?? 0,
+      });
+      this.statisticsOutputChannel.show();
+    }
   }
 
   private async showPreviewDocument(
