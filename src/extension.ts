@@ -21,7 +21,7 @@ import { WorkspaceStateProfileRepository } from './profile/profileRepository';
 import { InputBoxProfileProvider } from './profile/profileProvider';
 import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
-import { VSCodeStatisticsOutputChannel } from './output/statistics';
+import { VSCodeStatisticsOutputChannel } from './output/statisticsOutputChannel';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

@@ -19,7 +19,7 @@ import { SQLLog } from '../sqlLog/sqlLog';
 import { randomUUID } from 'crypto';
 import { ProfileRepository } from '../profile/profileRepository';
 import { ConnectionRepository } from '../connection/connectionRepository';
-import { StatisticsOutputChannel } from '../output/statistics';
+import { StatisticsOutputChannel } from '../output/statisticsOutputChannel';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
