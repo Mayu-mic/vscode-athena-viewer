@@ -169,7 +169,7 @@
     "viewsWelcome": [
       {
         "view": "view-connection",
-        "contents": "No connecion found.\n[Setup Region](command:vscode-athena-viewer.swtichRegion)\n[Setup Profile](command:vscode-athena-viewer.switchProfile)"
+        "contents": "No connecion found.\n[Setup Region](command:vscode-athena-viewer.switchRegion)\n[Setup Profile](command:vscode-athena-viewer.switchProfile)"
       }
     ]
   },
