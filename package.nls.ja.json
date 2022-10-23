@@ -1,7 +1,10 @@
 {
-	"run-query-command-title": "Amazon Athena: SQLを実行する",
-	"setup-configs-title": "Amazon Athena: 接続設定を変更する",
-	"config-not-found": "接続設定がありません。",
-	"mfa-code-not-found": "コードを入力してください。",
-	"editor-not-found": "アクティブなエディターがありません。"
+  "run-query-command-title": "SQLを実行する",
+  "switch-region-title": "リージョンを切り替える",
+  "switch-profile-title": "プロファイルを切り替える",
+  "input-workgroup-title": "ワークグループを変更する",
+  "profile-not-found": "接続プロファイルが設定されていません。",
+  "connection-not-found": "接続設定がありません。",
+  "mfa-code-not-found": "コードを入力してください。",
+  "editor-not-found": "アクティブなエディターがありません。"
 }

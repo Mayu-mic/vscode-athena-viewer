@@ -9,33 +9,25 @@ import {
   workspace,
 } from 'vscode';
 import { AthenaClientWrapper, QueryResult } from '../athena';
-import {
-  IConfigurationProvider,
-  IConfigurationRepository,
-} from '../config/config-repository';
-import {
-  ICredentialsProvider,
-  ICredentialsRepository,
-} from '../credentials/credentials';
-import { getCredentialProfiles } from '../credentials/get-profiles';
+import { CredentialsRepository } from '../credentials/credentialsRepository';
+import { CredentialsProvider } from '../credentials/credentialsProvider';
 import { localeString } from '../i18n';
-import { ExtensionConfig } from '../types';
-import { TableItem } from '../view/databases-view';
 import { stringify } from 'csv-stringify/sync';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
-import { ISQLLogRepository } from '../sql-log/sql-log-repository';
-import { SQLLog } from '../sql-log/sql-log';
+import { ISQLLogRepository } from '../sqlLog/sqlLogRepository';
+import { SQLLog } from '../sqlLog/sqlLog';
 import { randomUUID } from 'crypto';
-import { SQLLogItem } from '../sql-log/sql-logs-view';
+import { ProfileRepository } from '../profile/profileRepository';
+import { ConnectionRepository } from '../connection/connectionRepository';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
 
   constructor(
-    private configRepository: IConfigurationRepository,
-    private configProvider: IConfigurationProvider,
-    private credentialsRepository: ICredentialsRepository,
-    private credentialsProvider: ICredentialsProvider,
+    private connectionsRepository: ConnectionRepository,
+    private profileRespository: ProfileRepository,
+    private credentialsRepository: CredentialsRepository,
+    private credentialsProvider: CredentialsProvider,
     private sqlLogRepository: ISQLLogRepository
   ) {}
 
@@ -49,8 +41,8 @@ export class QueryCommandProvider {
     await this.runQuery(editorText, true);
   }
 
-  async showTablesCommand(item: TableItem) {
-    const sql = `select * from "${item.parentDatabase}"."${item.name}" limit ${this.DEFAULT_PREVIEW_LIMIT};`;
+  async showTablesCommand(database: string, table: string) {
+    const sql = `select * from "${database}"."${table}" limit ${this.DEFAULT_PREVIEW_LIMIT};`;
     const doc = await workspace.openTextDocument({
       language: 'sql',
       content: sql,
@@ -62,8 +54,8 @@ export class QueryCommandProvider {
     await this.runQuery(sql);
   }
 
-  async queryLogCommand(item: SQLLogItem) {
-    const sql = item.sqlLog.statement;
+  async queryLogCommand(sqlLog: SQLLog) {
+    const sql = sqlLog.statement;
     const doc = await workspace.openTextDocument({
       language: 'sql',
       content: sql,
@@ -76,15 +68,26 @@ export class QueryCommandProvider {
   }
 
   private async runQuery(query: string, addLog = false) {
-    const configs = await this.getConfigs();
-    if (!configs) {
-      window.showErrorMessage(localeString('config-not-found'));
+    const profile = this.profileRespository.getProfile();
+    if (!profile) {
+      window.showErrorMessage(localeString('profile-not-found'));
       return;
     }
-    const { profile, region, workgroup } = configs;
-    const credentials =
-      this.credentialsRepository.getCredentials(profile) ??
-      (await this.credentialsProvider.provideCredentials(profile));
+    const connection = this.connectionsRepository.getConnection();
+    if (!connection) {
+      window.showErrorMessage(localeString('connection-not-found'));
+      return;
+    }
+    let credentials = this.credentialsRepository.getCredentials(profile.id);
+    if (!credentials) {
+      credentials = await this.credentialsProvider.provideCredentials(
+        profile.id
+      );
+      if (!credentials) {
+        return;
+      }
+      this.credentialsRepository.setCredentials(profile.id, credentials);
+    }
 
     let result: QueryResult;
     await window
@@ -94,8 +97,11 @@ export class QueryCommandProvider {
           location: ProgressLocation.Notification,
         },
         async () => {
-          const client = new AthenaClientWrapper(region, credentials);
-          result = await client.runQuery(query, workgroup);
+          const client = new AthenaClientWrapper(
+            connection.region.id,
+            credentials!
+          );
+          result = await client.runQuery(query, connection.workgroup);
         }
       )
       .then(
@@ -145,37 +151,5 @@ export class QueryCommandProvider {
       languages.setTextDocumentLanguage(doc, languageId);
     }
     await window.showTextDocument(doc, options);
-  }
-
-  private async getConfigs(): Promise<ExtensionConfig | undefined> {
-    const profiles = await getCredentialProfiles();
-    let profile = this.configRepository.getProfile();
-    if (!profile) {
-      profile = await this.configProvider.provideProfile(profiles);
-      if (!profile) {
-        return;
-      }
-      this.configRepository.setProfile(profile);
-    }
-
-    let region = this.configRepository.getRegion();
-    if (!region) {
-      region = await this.configProvider.provideRegion();
-      if (!region) {
-        return;
-      }
-      this.configRepository.setRegion(region);
-    }
-
-    let workgroup = this.configRepository.getWorkgroup();
-    if (!workgroup) {
-      workgroup = await this.configProvider.provideWorkgroup();
-      if (!workgroup) {
-        return;
-      }
-      this.configRepository.setWorkgroup(workgroup);
-    }
-
-    return { profile, region, workgroup };
   }
 }

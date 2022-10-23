@@ -7,17 +7,14 @@ import {
   TreeItemCollapsibleState,
 } from 'vscode';
 import { truncate } from '../util';
-import { SQLLog } from './sql-log';
-import { ISQLLogRepository } from './sql-log-repository';
+import { SQLLog } from './sqlLog';
+import { ISQLLogRepository } from './sqlLogRepository';
 
 export class SQLLogsViewProvider implements TreeDataProvider<SQLLogItem> {
   constructor(private sqlLogsRepository: ISQLLogRepository) {}
 
-  private _onDidChangeTreeData: EventEmitter<
-    SQLLogItem | undefined | null | void
-  > = new EventEmitter();
-  readonly onDidChangeTreeData: Event<SQLLogItem | undefined | null | void> =
-    this._onDidChangeTreeData.event;
+  private _onDidChangeTreeData: EventEmitter<void> = new EventEmitter();
+  readonly onDidChangeTreeData: Event<void> = this._onDidChangeTreeData.event;
 
   getTreeItem(element: SQLLogItem): TreeItem | Thenable<TreeItem> {
     return element;
@@ -37,8 +34,8 @@ export class SQLLogsViewProvider implements TreeDataProvider<SQLLogItem> {
     this.refresh();
   }
 
-  deleteLog(item: SQLLogItem) {
-    const id = item.sqlLog.id;
+  deleteLog(sqlLog: SQLLog) {
+    const id = sqlLog.id;
     this.sqlLogsRepository.delete(id);
     this.refresh();
   }
