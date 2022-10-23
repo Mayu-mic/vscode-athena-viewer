@@ -1,7 +1,7 @@
 {
-  "run-query-command-title": "Amazon Athena: SQLを実行する",
-  "switch-region-title": "Amazon Athena: リージョンを切り替える",
-  "switch-profile-title": "Amazon Athena: プロファイルを切り替える",
+  "run-query-command-title": "SQLを実行する",
+  "switch-region-title": "リージョンを切り替える",
+  "switch-profile-title": "プロファイルを切り替える",
   "input-workgroup-title": "ワークグループを変更する",
   "profile-not-found": "接続プロファイルが設定されていません。",
   "connection-not-found": "接続設定がありません。",

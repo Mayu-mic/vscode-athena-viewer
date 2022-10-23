@@ -59,7 +59,7 @@
       {
         "command": "vscode-athena-viewer.runSQLLog",
         "title": "re-run",
-        "icon": "$(eye)"
+        "icon": "$(play)"
       },
       {
         "command": "vscode-athena-viewer.deleteSQLLog",
@@ -68,7 +68,7 @@
       {
         "command": "vscode-athena-viewer.showTable",
         "title": "preview",
-        "icon": "$(eye)"
+        "icon": "$(play)"
       }
     ],
     "submenus": [
