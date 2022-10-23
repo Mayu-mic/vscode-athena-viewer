@@ -21,6 +21,7 @@ import { WorkspaceStateProfileRepository } from './profile/profileRepository';
 import { InputBoxProfileProvider } from './profile/profileProvider';
 import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
+import { VSCodeStatisticsOutputChannel } from './output/statistics';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -45,12 +46,14 @@ export function activate(context: vscode.ExtensionContext) {
   const sqlLogsRepository = new SQLLogWorkspaceRepository(context);
   const sqlLogsView = new SQLLogsViewProvider(sqlLogsRepository);
 
+  const outputChannel = new VSCodeStatisticsOutputChannel();
   const queryCommandProvider = new QueryCommandProvider(
     connectionRepository,
     profileRepository,
     credentialsRepository,
     credentialsProvider,
-    sqlLogsRepository
+    sqlLogsRepository,
+    outputChannel
   );
 
   const profileProvider = new InputBoxProfileProvider();
@@ -122,6 +125,7 @@ export function activate(context: vscode.ExtensionContext) {
       new AthenaTableViewer()
     ),
     profileStatusViewProvider.provide(),
+    outputChannel,
   ];
 
   disposables.forEach((disposable) => context.subscriptions.push(disposable));

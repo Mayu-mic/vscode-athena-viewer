@@ -3,6 +3,7 @@ import {
   Database,
   DataCatalogSummary,
   GetQueryExecutionCommand,
+  GetQueryExecutionCommandOutput,
   GetQueryResultsCommand,
   GetQueryResultsInput,
   GetQueryResultsOutput,
@@ -12,6 +13,7 @@ import {
   ListDataCatalogsCommandInput,
   ListTableMetadataCommand,
   ListTableMetadataInput,
+  QueryExecutionStatistics,
   StartQueryExecutionCommand,
   TableMetadata,
 } from '@aws-sdk/client-athena';
@@ -21,6 +23,7 @@ import { filled } from './util';
 export interface QueryResult {
   columns: string[];
   rows: (string | undefined)[][];
+  statistics?: QueryExecutionStatistics;
 }
 
 export class AthenaClientWrapper {
@@ -103,7 +106,7 @@ export class AthenaClientWrapper {
   }
 
   async runQuery(sql: string, workgroup: string): Promise<QueryResult> {
-    const results = await this.getQueryData(sql, workgroup);
+    const [results, execution] = await this.getQueryData(sql, workgroup);
     const columnInfo = results[0].ResultSet?.ResultSetMetadata?.ColumnInfo;
     if (!columnInfo) {
       throw new Error('ColumnInfo is empty.');
@@ -127,13 +130,13 @@ export class AthenaClientWrapper {
       });
     });
 
-    return { columns, rows };
+    return { columns, rows, statistics: execution.QueryExecution?.Statistics };
   }
 
   private async getQueryData(
     sql: string,
     workgroup: string
-  ): Promise<GetQueryResultsOutput[]> {
+  ): Promise<[GetQueryResultsOutput[], GetQueryExecutionCommandOutput]> {
     const client = await this.getClient();
     const startQueryExecution = new StartQueryExecutionCommand({
       QueryString: sql,
@@ -177,7 +180,7 @@ export class AthenaClientWrapper {
       results.push(result);
     } while (nextToken);
 
-    return results;
+    return [results, queryExecutionResult];
   }
 
   private async getClient(): Promise<AthenaClient> {
