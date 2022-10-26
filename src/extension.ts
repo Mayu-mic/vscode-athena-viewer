@@ -111,6 +111,13 @@ export function activate(context: vscode.ExtensionContext) {
       sqlLogsView.clear()
     ),
     vscode.commands.registerCommand(
+      'vscode-athena-viewer.copyTableName',
+      (item: TableItem) => {
+        const text = `"${item.parent.database.Name}"."${item.table.Name}"`;
+        vscode.env.clipboard.writeText(text);
+      }
+    ),
+    vscode.commands.registerCommand(
       'vscode-athena-viewer.runSQLLog',
       (item: SQLLogItem) => queryCommandProvider.queryLogCommand(item.sqlLog)
     ),
