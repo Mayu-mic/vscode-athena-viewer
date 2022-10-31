@@ -69,6 +69,10 @@
         "command": "vscode-athena-viewer.showTable",
         "title": "preview",
         "icon": "$(play)"
+      },
+      {
+        "command": "vscode-athena-viewer.copyTableName",
+        "title": "%copy-table-name-title%"
       }
     ],
     "submenus": [
@@ -133,6 +137,10 @@
           "command": "vscode-athena-viewer.showTable",
           "when": "view == view-connection && viewItem == table",
           "group": "inline"
+        },
+        {
+          "command": "vscode-athena-viewer.copyTableName",
+          "when": "view == view-connection && viewItem == table"
         },
         {
           "command": "vscode-athena-viewer.runSQLLog",

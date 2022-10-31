@@ -1,5 +1,5 @@
 import * as AWS from '@aws-sdk/types';
-import { WorkspaceStateRepository } from '../baseRepository';
+import { GlobalStateRepository } from '../baseRepository';
 
 export interface CredentialsRepository {
   getCredentials(profile: string): AWS.Credentials | undefined;
@@ -7,7 +7,7 @@ export interface CredentialsRepository {
 }
 
 export class WorkspaceStateCredentialsRepository
-  extends WorkspaceStateRepository
+  extends GlobalStateRepository
   implements CredentialsRepository
 {
   getCredentials(profile: string): AWS.Credentials | undefined {

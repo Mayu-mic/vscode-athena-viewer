@@ -1,4 +1,4 @@
-import { WorkspaceStateRepository } from '../baseRepository';
+import { GlobalStateRepository } from '../baseRepository';
 import { Connection } from './connection';
 
 export interface ConnectionRepository {
@@ -7,7 +7,7 @@ export interface ConnectionRepository {
 }
 
 export class WorkspaceStateConnectionRepository
-  extends WorkspaceStateRepository
+  extends GlobalStateRepository
   implements ConnectionRepository
 {
   private KEY = 'connection';
