@@ -1,10 +1,10 @@
 import { ExtensionContext, Memento } from 'vscode';
 
-export abstract class WorkspaceStateRepository {
+export abstract class GlobalStateRepository {
   private state: Memento;
 
   constructor(ctx: ExtensionContext) {
-    this.state = ctx.workspaceState;
+    this.state = ctx.globalState;
   }
 
   protected get<T>(key: string): T | undefined {

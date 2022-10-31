@@ -1,4 +1,4 @@
-import { WorkspaceStateRepository } from '../baseRepository';
+import { GlobalStateRepository } from '../baseRepository';
 import { Profile } from './profile';
 
 export interface ProfileRepository {
@@ -7,7 +7,7 @@ export interface ProfileRepository {
 }
 
 export class WorkspaceStateProfileRepository
-  extends WorkspaceStateRepository
+  extends GlobalStateRepository
   implements ProfileRepository
 {
   setProfile(profile: Profile): void {

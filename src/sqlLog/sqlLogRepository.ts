@@ -1,5 +1,5 @@
 import { ExtensionContext } from 'vscode';
-import { WorkspaceStateRepository } from '../baseRepository';
+import { GlobalStateRepository } from '../baseRepository';
 import { SQLLog, SQLLogJson } from './sqlLog';
 
 export interface ISQLLogRepository {
@@ -10,7 +10,7 @@ export interface ISQLLogRepository {
 }
 
 export class SQLLogWorkspaceRepository
-  extends WorkspaceStateRepository
+  extends GlobalStateRepository
   implements ISQLLogRepository
 {
   private KEY = 'sql-logs';
