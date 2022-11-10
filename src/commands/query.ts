@@ -20,6 +20,7 @@ import { randomUUID } from 'crypto';
 import { ProfileRepository } from '../profile/profileRepository';
 import { ConnectionRepository } from '../connection/connectionRepository';
 import { StatisticsOutputChannel } from '../output/statisticsOutputChannel';
+import { isUsingParameterSql } from '../util';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
@@ -103,7 +104,17 @@ export class QueryCommandProvider {
             connection.region.id,
             credentials!
           );
-          result = await client.runQuery(query, connection.workgroup);
+
+          let parameters: string[] = [];
+          if (isUsingParameterSql(query)) {
+            parameters = await this.getParametersFromInputBox();
+          }
+
+          result = await client.runQuery(
+            query,
+            connection.workgroup,
+            parameters
+          );
         }
       )
       .then(
@@ -167,5 +178,13 @@ export class QueryCommandProvider {
       languages.setTextDocumentLanguage(doc, languageId);
     }
     await window.showTextDocument(doc, options);
+  }
+
+  private async getParametersFromInputBox(): Promise<string[]> {
+    const input = await window.showInputBox({
+      title: 'Are you perhaps using parameters?',
+      placeHolder: "ex) 'param1','param2','param3'",
+    });
+    return (input || undefined)?.split(',') || [];
   }
 }

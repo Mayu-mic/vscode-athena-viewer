@@ -17,3 +17,8 @@ export function truncate(
     return text.substring(0, length - option.omission.length) + option.omission;
   }
 }
+
+export function isUsingParameterSql(query: string): boolean {
+  const afterWhere = query.split('where')[1];
+  return !!afterWhere?.includes('?');
+}
