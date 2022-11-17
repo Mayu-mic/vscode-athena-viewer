@@ -105,8 +105,16 @@ export class AthenaClientWrapper {
       .flatMap((result) => result.TableMetadataList!);
   }
 
-  async runQuery(sql: string, workgroup: string): Promise<QueryResult> {
-    const [results, execution] = await this.getQueryData(sql, workgroup);
+  async runQuery(
+    sql: string,
+    workgroup: string,
+    executionParameters: string[]
+  ): Promise<QueryResult> {
+    const [results, execution] = await this.getQueryData(
+      sql,
+      workgroup,
+      executionParameters
+    );
     const columnInfo = results[0].ResultSet?.ResultSetMetadata?.ColumnInfo;
     if (!columnInfo) {
       throw new Error('ColumnInfo is empty.');
@@ -135,13 +143,18 @@ export class AthenaClientWrapper {
 
   private async getQueryData(
     sql: string,
-    workgroup: string
+    workgroup: string,
+    executionParameters: string[]
   ): Promise<[GetQueryResultsOutput[], GetQueryExecutionCommandOutput]> {
     const client = await this.getClient();
     const startQueryExecution = new StartQueryExecutionCommand({
       QueryString: sql,
       WorkGroup: workgroup,
     });
+    if (executionParameters.length > 0) {
+      startQueryExecution.input.ExecutionParameters = executionParameters;
+    }
+
     const { QueryExecutionId } = await client.send(startQueryExecution);
     const endStatuses = new Set(['FAILED', 'SUCCEEDED', 'CANCELLED']);
     let queryExecutionResult;
