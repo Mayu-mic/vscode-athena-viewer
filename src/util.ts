@@ -19,6 +19,6 @@ export function truncate(
 }
 
 export function isParameterizedQuery(query: string): boolean {
-  const afterWhere = query.split('where')[1];
+  const afterWhere = query.toLowerCase().split('where')[1];
   return !!afterWhere?.includes('?');
 }
