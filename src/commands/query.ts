@@ -20,7 +20,7 @@ import { randomUUID } from 'crypto';
 import { ProfileRepository } from '../profile/profileRepository';
 import { ConnectionRepository } from '../connection/connectionRepository';
 import { StatisticsOutputChannel } from '../output/statisticsOutputChannel';
-import { isUsingParameterSql } from '../util';
+import { isParameterizedQuery } from '../util';
 
 export class QueryCommandProvider {
   private DEFAULT_PREVIEW_LIMIT = 10;
@@ -106,7 +106,7 @@ export class QueryCommandProvider {
           );
 
           let parameters: string[] = [];
-          if (isUsingParameterSql(query)) {
+          if (isParameterizedQuery(query)) {
             parameters = await this.getParametersFromInputBox();
           }
 

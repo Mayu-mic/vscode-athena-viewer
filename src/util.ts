@@ -18,7 +18,7 @@ export function truncate(
   }
 }
 
-export function isUsingParameterSql(query: string): boolean {
+export function isParameterizedQuery(query: string): boolean {
   const afterWhere = query.split('where')[1];
   return !!afterWhere?.includes('?');
 }
