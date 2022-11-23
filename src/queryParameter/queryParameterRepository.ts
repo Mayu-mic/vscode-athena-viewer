@@ -15,6 +15,10 @@ export class WorkspaceStateQueryParameterRepository
   private MAX_PARAMETERS = 20;
 
   addParameter(parameter: QueryParameter): void {
+    if (parameter.items.length === 0) {
+      throw new Error("Can't add empty parameter");
+    }
+
     const parameters = this.getParameters();
     parameters.unshift(parameter);
 

@@ -119,7 +119,7 @@ export class QueryCommandProvider {
           result = await client.runQuery(
             query,
             connection.workgroup,
-            parameters!.items.map((p) => p.text)
+            parameters?.items.map((p) => p.text) || []
           );
         }
       )
