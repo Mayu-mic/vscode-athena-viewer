@@ -22,6 +22,8 @@ import { InputBoxProfileProvider } from './profile/profileProvider';
 import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
 import { VSCodeStatisticsOutputChannel } from './output/statisticsOutputChannel';
+import { QueryParameterSelectorProvider } from './queryParameter/queryParameterSelectorProvider';
+import { WorkspaceStateQueryParameterRepository } from './queryParameter/queryParameterRepository';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -47,13 +49,20 @@ export function activate(context: vscode.ExtensionContext) {
   const sqlLogsView = new SQLLogsViewProvider(sqlLogsRepository);
 
   const outputChannel = new VSCodeStatisticsOutputChannel();
+  const queryParameterRepository = new WorkspaceStateQueryParameterRepository(
+    context
+  );
+  const queryParameterSelectorProvider = new QueryParameterSelectorProvider(
+    queryParameterRepository
+  );
   const queryCommandProvider = new QueryCommandProvider(
     connectionRepository,
     profileRepository,
     credentialsRepository,
     credentialsProvider,
     sqlLogsRepository,
-    outputChannel
+    outputChannel,
+    queryParameterSelectorProvider
   );
 
   const profileProvider = new InputBoxProfileProvider();
