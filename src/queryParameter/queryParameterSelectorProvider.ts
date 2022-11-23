@@ -34,7 +34,10 @@ export class QueryParameterSelectorProvider {
       quickPick.placeholder = "ex) 'param1','param2','param3'";
       quickPick.onDidChangeValue(() => {
         if (!items.map((i) => i.label).includes(quickPick.value)) {
-          quickPick.items = [{ label: quickPick.value }, ...items];
+          quickPick.items = [
+            { label: quickPick.value, description: 'Add new parameter' },
+            ...items,
+          ];
         }
       });
       quickPick.onDidAccept(() => {
