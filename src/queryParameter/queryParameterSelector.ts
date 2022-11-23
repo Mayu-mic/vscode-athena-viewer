@@ -2,10 +2,10 @@ import { QuickPickItem, window } from 'vscode';
 import { QueryParameter } from './queryParameter';
 import { QueryParameterRepository } from './queryParameterRepository';
 
-export class QueryParameterSelectorProvider {
+export class QueryParameterSelector {
   constructor(private repository: QueryParameterRepository) {}
 
-  async provide(): Promise<QueryParameter | undefined> {
+  async show(): Promise<QueryParameter | undefined> {
     const parameters = this.repository.getParameters();
     const items: QuickPickItem[] = parameters.map((p) => ({
       label: p.items.map((i) => i.text).join(','),

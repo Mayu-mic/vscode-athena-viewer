@@ -21,7 +21,7 @@ import { ProfileRepository } from '../profile/profileRepository';
 import { ConnectionRepository } from '../connection/connectionRepository';
 import { StatisticsOutputChannel } from '../output/statisticsOutputChannel';
 import { isParameterizedQuery } from '../util';
-import { QueryParameterSelectorProvider } from '../queryParameter/queryParameterSelectorProvider';
+import { QueryParameterSelector } from '../queryParameter/queryParameterSelector';
 import { QueryParameter } from '../queryParameter/queryParameter';
 
 export class QueryCommandProvider {
@@ -34,7 +34,7 @@ export class QueryCommandProvider {
     private credentialsProvider: CredentialsProvider,
     private sqlLogRepository: ISQLLogRepository,
     private statisticsOutputChannel: StatisticsOutputChannel,
-    private queryParameterSelectorProvider: QueryParameterSelectorProvider
+    private queryParameterSelector: QueryParameterSelector
   ) {}
 
   async runQueryCommand() {
@@ -110,7 +110,7 @@ export class QueryCommandProvider {
 
           let parameters: QueryParameter | undefined = undefined;
           if (isParameterizedQuery(query)) {
-            parameters = await this.queryParameterSelectorProvider.provide();
+            parameters = await this.queryParameterSelector.show();
             if (!parameters) {
               return;
             }
