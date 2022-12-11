@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { QueryCommandProvider } from './commands/query';
+import { QueryCommandProvider } from './commands/queryCommandProvider';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
 import { WorkspaceStateCredentialsRepository } from './credentials/credentialsRepository';
 import { AWSCredentialsProvider } from './credentials/credentialsProvider';
@@ -24,6 +24,7 @@ import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from '
 import { VSCodeStatisticsOutputChannel } from './output/statisticsOutputChannel';
 import { QueryParameterSelector } from './queryParameter/queryParameterSelector';
 import { WorkspaceStateQueryParameterRepository } from './queryParameter/queryParameterRepository';
+import { DefaultQueryRunner, QueryRunner } from './commands/queryRunner';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -55,15 +56,16 @@ export function activate(context: vscode.ExtensionContext) {
   const queryParameterSelector = new QueryParameterSelector(
     queryParameterRepository
   );
-  const queryCommandProvider = new QueryCommandProvider(
+  const queryRunner: QueryRunner = new DefaultQueryRunner(
     connectionRepository,
     profileRepository,
     credentialsRepository,
     credentialsProvider,
-    sqlLogsRepository,
     outputChannel,
-    queryParameterSelector
+    queryParameterSelector,
+    sqlLogsRepository
   );
+  const queryCommandProvider = new QueryCommandProvider(queryRunner);
 
   const profileProvider = new InputBoxProfileProvider();
   const switchProfileCommandProvider = new SwitchProfileCommandProvider(
