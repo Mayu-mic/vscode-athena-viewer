@@ -1,4 +1,5 @@
 import {
+  Athena,
   AthenaClient,
   Database,
   DataCatalogSummary,
@@ -30,13 +31,14 @@ export interface QueryResult {
 
 export class AthenaClientWrapper {
   public onQueryCancelEvent: Event<any> | undefined = undefined;
+  private client: AthenaClient;
   private DEFAULT_SLEEP_TIME = 200;
 
-  constructor(private region: string, private credentials: AWS.Credentials) {}
+  constructor(region: string, credentials: AWS.Credentials) {
+    this.client = new AthenaClient({ region, credentials });
+  }
 
   async getDataCatalogs(): Promise<DataCatalogSummary[] | undefined> {
-    const client = await this.getClient();
-
     let nextToken: string | undefined = undefined;
     const results = [];
 
@@ -46,7 +48,9 @@ export class AthenaClientWrapper {
         payload.NextToken = nextToken;
         this.sleep(this.DEFAULT_SLEEP_TIME);
       }
-      const result = await client.send(new ListDataCatalogsCommand(payload));
+      const result = await this.client.send(
+        new ListDataCatalogsCommand(payload)
+      );
       results.push(result);
       nextToken = result.NextToken;
     } while (nextToken);
@@ -57,8 +61,6 @@ export class AthenaClientWrapper {
   }
 
   async getDatabases(catalogName: string): Promise<Database[]> {
-    const client = await this.getClient();
-
     let nextToken: string | undefined = undefined;
     const results = [];
 
@@ -70,7 +72,7 @@ export class AthenaClientWrapper {
         payload.NextToken = nextToken;
         this.sleep(this.DEFAULT_SLEEP_TIME);
       }
-      const result = await client.send(new ListDatabasesCommand(payload));
+      const result = await this.client.send(new ListDatabasesCommand(payload));
       results.push(result);
       nextToken = result.NextToken;
     } while (nextToken);
@@ -84,8 +86,6 @@ export class AthenaClientWrapper {
     catalogName: string,
     database: string
   ): Promise<TableMetadata[] | undefined> {
-    const client = await this.getClient();
-
     let nextToken: string | undefined = undefined;
     const results = [];
 
@@ -98,7 +98,9 @@ export class AthenaClientWrapper {
         payload.NextToken = nextToken;
         this.sleep(this.DEFAULT_SLEEP_TIME);
       }
-      const result = await client.send(new ListTableMetadataCommand(payload));
+      const result = await this.client.send(
+        new ListTableMetadataCommand(payload)
+      );
       results.push(result);
       nextToken = result.NextToken;
     } while (nextToken);
@@ -156,7 +158,6 @@ export class AthenaClientWrapper {
   ): Promise<
     [GetQueryResultsOutput[], GetQueryExecutionCommandOutput] | undefined
   > {
-    const client = await this.getClient();
     const startQueryExecution = new StartQueryExecutionCommand({
       QueryString: sql,
       WorkGroup: workgroup,
@@ -165,7 +166,7 @@ export class AthenaClientWrapper {
       startQueryExecution.input.ExecutionParameters = executionParameters;
     }
 
-    const { QueryExecutionId } = await client.send(startQueryExecution);
+    const { QueryExecutionId } = await this.client.send(startQueryExecution);
     if (QueryExecutionId && this.onQueryCancelEvent) {
       this.onQueryCancelEvent(() => {
         this.stopQuery(QueryExecutionId);
@@ -180,7 +181,7 @@ export class AthenaClientWrapper {
       const getQueryExecution = new GetQueryExecutionCommand({
         QueryExecutionId,
       });
-      queryExecutionResult = await client.send(getQueryExecution);
+      queryExecutionResult = await this.client.send(getQueryExecution);
       await this.sleep(this.DEFAULT_SLEEP_TIME);
     } while (
       !endStatuses.has(
@@ -209,7 +210,9 @@ export class AthenaClientWrapper {
         payload.NextToken = nextToken;
         await this.sleep(this.DEFAULT_SLEEP_TIME);
       }
-      const result = await client.send(new GetQueryResultsCommand(payload));
+      const result = await this.client.send(
+        new GetQueryResultsCommand(payload)
+      );
       nextToken = result.NextToken;
       results.push(result);
     } while (nextToken);
@@ -218,18 +221,10 @@ export class AthenaClientWrapper {
   }
 
   private async stopQuery(queryExecutionId: string): Promise<void> {
-    const client = await this.getClient();
     const stopQueryExecution = new StopQueryExecutionCommand({
       QueryExecutionId: queryExecutionId,
     });
-    await client.send(stopQueryExecution);
-  }
-
-  private async getClient(): Promise<AthenaClient> {
-    return new AthenaClient({
-      region: this.region,
-      credentials: this.credentials,
-    });
+    await this.client.send(stopQueryExecution);
   }
 
   private async sleep(ms: number): Promise<void> {
