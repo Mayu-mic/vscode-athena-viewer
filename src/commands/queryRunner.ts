@@ -93,8 +93,11 @@ export class DefaultQueryRunner implements QueryRunner {
       {
         title: 'Run Query',
         location: ProgressLocation.Notification,
+        cancellable: true,
       },
-      async () => {
+      async (_, token) => {
+        client.onQueryCancelEvent = token.onCancellationRequested;
+
         let parameters: QueryParameter | undefined = undefined;
         if (isParameterizedQuery(query)) {
           parameters = await this.queryParameterSelector.show();
@@ -103,11 +106,19 @@ export class DefaultQueryRunner implements QueryRunner {
           }
         }
 
-        return await client.runQuery(
+        const results = await client.runQuery(
           query,
           connection.workgroup,
           parameters?.items.map((p) => p.text) || []
         );
+
+        if (!results) {
+          await window.showInformationMessage(
+            localeString('run-query-canceled')
+          );
+        }
+
+        return results;
       }
     );
   }

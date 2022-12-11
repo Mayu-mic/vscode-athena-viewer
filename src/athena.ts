@@ -15,9 +15,11 @@ import {
   ListTableMetadataInput,
   QueryExecutionStatistics,
   StartQueryExecutionCommand,
+  StopQueryExecutionCommand,
   TableMetadata,
 } from '@aws-sdk/client-athena';
 import * as AWS from '@aws-sdk/types';
+import { Event } from 'vscode';
 import { filled } from './util';
 
 export interface QueryResult {
@@ -27,6 +29,7 @@ export interface QueryResult {
 }
 
 export class AthenaClientWrapper {
+  public onQueryCancelEvent: Event<any> | undefined = undefined;
   private DEFAULT_SLEEP_TIME = 200;
 
   constructor(private region: string, private credentials: AWS.Credentials) {}
@@ -109,12 +112,17 @@ export class AthenaClientWrapper {
     sql: string,
     workgroup: string,
     executionParameters: string[]
-  ): Promise<QueryResult> {
-    const [results, execution] = await this.getQueryData(
+  ): Promise<QueryResult | undefined> {
+    const response = await this.getQueryData(
       sql,
       workgroup,
       executionParameters
     );
+    if (!response) {
+      return;
+    }
+
+    const [results, execution] = response;
     const columnInfo = results[0].ResultSet?.ResultSetMetadata?.ColumnInfo;
     if (!columnInfo) {
       throw new Error('ColumnInfo is empty.');
@@ -145,7 +153,9 @@ export class AthenaClientWrapper {
     sql: string,
     workgroup: string,
     executionParameters: string[]
-  ): Promise<[GetQueryResultsOutput[], GetQueryExecutionCommandOutput]> {
+  ): Promise<
+    [GetQueryResultsOutput[], GetQueryExecutionCommandOutput] | undefined
+  > {
     const client = await this.getClient();
     const startQueryExecution = new StartQueryExecutionCommand({
       QueryString: sql,
@@ -156,6 +166,13 @@ export class AthenaClientWrapper {
     }
 
     const { QueryExecutionId } = await client.send(startQueryExecution);
+    if (QueryExecutionId && this.onQueryCancelEvent) {
+      this.onQueryCancelEvent(() => {
+        this.stopQuery(QueryExecutionId);
+        return;
+      });
+    }
+
     const endStatuses = new Set(['FAILED', 'SUCCEEDED', 'CANCELLED']);
     let queryExecutionResult;
 
@@ -170,6 +187,10 @@ export class AthenaClientWrapper {
         queryExecutionResult.QueryExecution?.Status?.State ?? 'UNDEFINED'
       )
     );
+
+    if (queryExecutionResult.QueryExecution?.Status?.State === 'CANCELLED') {
+      return;
+    }
 
     if (queryExecutionResult.QueryExecution?.Status?.State === 'FAILED') {
       throw new Error(
@@ -194,6 +215,14 @@ export class AthenaClientWrapper {
     } while (nextToken);
 
     return [results, queryExecutionResult];
+  }
+
+  private async stopQuery(queryExecutionId: string): Promise<void> {
+    const client = await this.getClient();
+    const stopQueryExecution = new StopQueryExecutionCommand({
+      QueryExecutionId: queryExecutionId,
+    });
+    await client.send(stopQueryExecution);
   }
 
   private async getClient(): Promise<AthenaClient> {
