@@ -45,7 +45,7 @@ export class DefaultQueryRunner implements QueryRunner {
   async runQuery(query: string, addLog = false): Promise<void> {
     const profile = this.profileRespository.getProfile();
     if (!profile) {
-      await window.showErrorMessage(localeString('profile-not-found'));
+      window.showErrorMessage(localeString('profile-not-found'));
       return;
     }
     const connection = this.connectionsRepository.getConnection();
@@ -57,7 +57,8 @@ export class DefaultQueryRunner implements QueryRunner {
     let credentials = this.credentialsRepository.getCredentials(profile.id);
     if (!credentials) {
       credentials = await this.credentialsProvider.provideCredentials(
-        profile.id
+        profile.id,
+        connection.region
       );
       if (!credentials) {
         return;

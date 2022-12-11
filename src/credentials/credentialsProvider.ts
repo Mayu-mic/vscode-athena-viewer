@@ -1,49 +1,57 @@
 import * as AWS from '@aws-sdk/types';
-import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { fromIni } from '@aws-sdk/credential-provider-ini';
 import { AssumeRoleParams } from '@aws-sdk/credential-provider-ini/dist-types/resolveAssumeRoleCredentials';
 import { localeString } from '../i18n';
 import { window } from 'vscode';
+import { Region } from '../connection/region';
+import { FailedAssumeRoleError, STSClientWrapper } from '../sts';
 
 export interface CredentialsProvider {
-  provideCredentials(profile: string): Promise<AWS.Credentials | undefined>;
+  provideCredentials(
+    profile: string,
+    region: Region
+  ): Promise<AWS.Credentials | undefined>;
 }
+
+export class MFACodeNotFoundError extends Error {}
 
 export class AWSCredentialsProvider implements CredentialsProvider {
   async provideCredentials(
-    profile: string
+    profile: string,
+    region: Region
   ): Promise<AWS.Credentials | undefined> {
     try {
-      return await this.getCredentialsFromIni(profile);
-    } catch (error) {
-      window.showErrorMessage(localeString('mfa-code-not-found'));
+      return await this.getCredentialsFromIni(profile, region);
+    } catch (error: any) {
+      if (error instanceof MFACodeNotFoundError) {
+        window.showErrorMessage(localeString('mfa-code-not-found'));
+      } else if (error instanceof FailedAssumeRoleError) {
+        window.showErrorMessage(localeString('failed-assume-role-error'));
+      }
       return undefined;
     }
   }
 
   private async getCredentialsFromIni(
-    profile: string
+    profile: string,
+    region: Region
   ): Promise<AWS.Credentials> {
     return fromIni({
       profile,
-      roleAssumer: this.assumeRole,
+      roleAssumer: (sourceCreds: AWS.Credentials, params: AssumeRoleParams) =>
+        this.assumeRole(region, sourceCreds, params),
       mfaCodeProvider: async (mfaSerial) =>
         this.readMfaInput(mfaSerial, profile),
     })();
   }
 
   private async assumeRole(
+    region: Region,
     sourceCreds: AWS.Credentials,
     params: AssumeRoleParams
   ): Promise<AWS.Credentials> {
-    const sts = new STSClient({ credentials: sourceCreds });
-    const response = await sts.send(new AssumeRoleCommand(params));
-    return {
-      accessKeyId: response.Credentials!.AccessKeyId!,
-      secretAccessKey: response.Credentials!.SecretAccessKey!,
-      sessionToken: response.Credentials?.SessionToken,
-      expiration: response.Credentials?.Expiration,
-    };
+    const client = new STSClientWrapper(region.id, sourceCreds);
+    return await client.getAssumeRole(params);
   }
 
   private async readMfaInput(
@@ -58,7 +66,7 @@ export class AWSCredentialsProvider implements CredentialsProvider {
     });
 
     if (!token) {
-      throw new Error('MFA token is required');
+      throw new MFACodeNotFoundError();
     }
 
     return token;

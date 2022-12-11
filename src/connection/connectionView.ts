@@ -19,6 +19,7 @@ import { localeString } from '../i18n';
 import { ProfileRepository } from '../profile/profileRepository';
 import { Connection } from './connection';
 import { ConnectionRepository } from './connectionRepository';
+import { Region } from './region';
 
 export class ConnectionsViewProvider
   implements TreeDataProvider<DependencyElement>
@@ -73,7 +74,7 @@ export class ConnectionsViewProvider
   private async getDataCatalogs(
     connection: ConnectionItem
   ): Promise<DataCatalogItem[]> {
-    const region = connection.connection.region.id;
+    const region = connection.connection.region;
     const client = await this.getClient(region);
     const dataCatalogs = await client?.getDataCatalogs();
     if (dataCatalogs) {
@@ -95,7 +96,7 @@ export class ConnectionsViewProvider
   private async getDatabases(
     dataCatalog: DataCatalogItem
   ): Promise<DatabaseItem[]> {
-    const region = dataCatalog.parent.connection.region.id;
+    const region = dataCatalog.parent.connection.region;
     const dataCatalogName = dataCatalog.dataCatalog.CatalogName!;
     const client = await this.getClient(region);
     const databases = await client?.getDatabases(dataCatalogName);
@@ -116,7 +117,7 @@ export class ConnectionsViewProvider
   }
 
   private async getTables(database: DatabaseItem): Promise<TableItem[]> {
-    const region = database.parent.parent.connection.region.id;
+    const region = database.parent.parent.connection.region;
     const dataCatalogName = database.parent.dataCatalog.CatalogName!;
     const databaseName = database.database.Name!;
     const client = await this.getClient(region);
@@ -134,7 +135,7 @@ export class ConnectionsViewProvider
   }
 
   private async getClient(
-    region: string
+    region: Region
   ): Promise<AthenaClientWrapper | undefined> {
     const profile = this.profileRepository.getProfile();
     if (!profile) {
@@ -144,14 +145,15 @@ export class ConnectionsViewProvider
     let credentials = this.credentialsRepository.getCredentials(profile.id);
     if (!credentials) {
       credentials = await this.credentialsProvider.provideCredentials(
-        profile.id
+        profile.id,
+        region
       );
       if (!credentials) {
         return;
       }
       this.credentialsRepository.setCredentials(profile.id, credentials);
     }
-    return new AthenaClientWrapper(region, credentials);
+    return new AthenaClientWrapper(region.id, credentials);
   }
 }
 
