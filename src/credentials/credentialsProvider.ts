@@ -22,11 +22,15 @@ export class AWSCredentialsProvider implements CredentialsProvider {
   ): Promise<AWS.Credentials | undefined> {
     try {
       return await this.getCredentialsFromIni(profile, region);
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof MFACodeNotFoundError) {
         window.showErrorMessage(localeString('mfa-code-not-found'));
       } else if (error instanceof FailedAssumeRoleError) {
         window.showErrorMessage(localeString('failed-assume-role-error'));
+      } else if (error instanceof Error) {
+        window.showErrorMessage(error.message);
+      } else {
+        window.showErrorMessage(`unknown error: ${error}`);
       }
       return undefined;
     }
