@@ -8,5 +8,6 @@
   "connection-not-found": "接続設定がありません。",
   "mfa-code-not-found": "コードを入力してください。",
   "failed-assume-role-error": "Assume Role に失敗しました。AWSの接続設定を確認してください。",
+  "run-query-canceled": "クエリーをキャンセルしました。",
   "editor-not-found": "アクティブなエディターがありません。"
 }
