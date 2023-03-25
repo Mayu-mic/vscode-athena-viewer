@@ -1,6 +1,6 @@
 import { commands, EventEmitter, window } from 'vscode';
-import { ProfileProvider } from '../profile/profileProvider';
-import { ProfileRepository } from '../profile/profileRepository';
+import { ProfileProvider } from '../domain/profile/profileProvider';
+import { ProfileRepository } from '../domain/profile/profileRepository';
 import { parseKnownFiles } from '@aws-sdk/shared-ini-file-loader';
 
 export class SwitchProfileCommandProvider {

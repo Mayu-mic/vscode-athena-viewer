@@ -22,7 +22,7 @@ import { CredentialsProvider } from '../domain/credentials/credentialsProvider';
 import { CredentialsRepository } from '../domain/credentials/credentialsRepository';
 import { localeString } from '../i18n';
 import { StatisticsOutputChannel } from '../domain/statistics/statisticsOutputChannel';
-import { ProfileRepository } from '../profile/profileRepository';
+import { ProfileRepository } from '../domain/profile/profileRepository';
 import { QueryParameter } from '../queryParameter/queryParameter';
 import { QueryParameterSelector } from '../queryParameter/queryParameterSelector';
 import { SQLLog } from '../sqlLog/sqlLog';

@@ -8,7 +8,7 @@ import { AWSCredentialsProvider } from './domain/credentials/credentialsProvider
 import { WorkspaceStateSQLLogRepository } from './sqlLog/sqlLogRepository';
 import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
-import { ProfileStatusViewProvider } from './profile/profileStatusView';
+import { ProfileStatusViewProvider } from './domain/profile/profileStatusView';
 import {
   ConnectionsViewProvider,
   TableItem,
@@ -17,8 +17,8 @@ import { WorkspaceStateConnectionRepository } from './connection/connectionRepos
 import { QuickPickRegionProvider } from './connection/regionProvider';
 import { SwitchRegionCommandProvider } from './commands/switchRegion';
 import { SwitchProfileCommandProvider } from './commands/switchProfile';
-import { WorkspaceStateProfileRepository } from './profile/profileRepository';
-import { InputBoxProfileProvider } from './profile/profileProvider';
+import { WorkspaceStateProfileRepository } from './domain/profile/profileRepository';
+import { InputBoxProfileProvider } from './domain/profile/profileProvider';
 import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
 import { VSCodeStatisticsOutputChannel } from './domain/statistics/statisticsOutputChannel';
