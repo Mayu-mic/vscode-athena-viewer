@@ -1,6 +1,7 @@
 import {
   Athena,
   AthenaClient,
+  Column,
   Database,
   DataCatalogSummary,
   GetQueryExecutionCommand,
@@ -8,6 +9,7 @@ import {
   GetQueryResultsCommand,
   GetQueryResultsInput,
   GetQueryResultsOutput,
+  GetTableMetadataCommand,
   ListDatabasesCommand,
   ListDatabasesCommandInput,
   ListDataCatalogsCommand,
@@ -108,6 +110,22 @@ export class AthenaClientWrapper {
     return results
       .filter((result) => result.TableMetadataList)
       .flatMap((result) => result.TableMetadataList!);
+  }
+
+  async getColumns(
+    catalogName: string,
+    database: string,
+    table: string
+  ): Promise<Column[] | undefined> {
+    const result = await this.client.send(
+      new GetTableMetadataCommand({
+        CatalogName: catalogName,
+        DatabaseName: database,
+        TableName: table,
+      })
+    );
+
+    return result.TableMetadata?.Columns;
   }
 
   async runQuery(
