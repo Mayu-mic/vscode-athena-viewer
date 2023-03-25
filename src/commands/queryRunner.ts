@@ -15,8 +15,8 @@ import {
   DefaultAthenaClientWrapper,
   QueryResult,
 } from '../clients/athenaClientWrapper';
-import { Connection } from '../connection/connection';
-import { ConnectionRepository } from '../connection/connectionRepository';
+import { Connection } from '../domain/connection/connection';
+import { ConnectionRepository } from '../domain/connection/connectionRepository';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
 import { AWSCredentialsProvider } from '../domain/credentials/credentialsProvider';
 import { CredentialsRepository } from '../domain/credentials/credentialsRepository';

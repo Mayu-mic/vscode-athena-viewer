@@ -1,5 +1,5 @@
 import { window } from 'vscode';
-import { ConnectionRepository } from './connectionRepository';
+import { ConnectionRepository } from '../domain/connection/connectionRepository';
 
 export interface WorkgroupProvider {
   provideWorkgroup(): Promise<string | undefined>;

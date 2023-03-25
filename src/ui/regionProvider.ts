@@ -1,5 +1,5 @@
 import { QuickPickItem, window } from 'vscode';
-import { Region, regions } from './region';
+import { Region, regions } from '../domain/connection/region';
 
 export interface RegionProvider {
   provideRegion(): Promise<Region | undefined>;

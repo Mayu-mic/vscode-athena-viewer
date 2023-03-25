@@ -1,7 +1,7 @@
 import {
   MementoStateAccessor,
   StateAccessor,
-} from '../infrastracture/stateAccessor';
+} from '../../infrastracture/stateAccessor';
 import { Connection } from './connection';
 import { ExtensionContext } from 'vscode';
 

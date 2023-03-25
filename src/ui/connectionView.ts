@@ -21,9 +21,9 @@ import { AWSCredentialsProvider } from '../domain/credentials/credentialsProvide
 import { CredentialsRepository } from '../domain/credentials/credentialsRepository';
 import { localeString } from '../i18n';
 import { ProfileRepository } from '../domain/profile/profileRepository';
-import { Connection } from './connection';
-import { ConnectionRepository } from './connectionRepository';
-import { Region } from './region';
+import { Connection } from '../domain/connection/connection';
+import { ConnectionRepository } from '../domain/connection/connectionRepository';
+import { Region } from '../domain/connection/region';
 
 export class ConnectionsViewProvider
   implements TreeDataProvider<DependencyElement>

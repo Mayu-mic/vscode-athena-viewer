@@ -8,17 +8,14 @@ import { WorkspaceStateSQLLogRepository } from './domain/sqlLog/sqlLogRepository
 import { SQLLogItem, SQLLogsViewProvider } from './ui/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
 import { ProfileStatusViewProvider } from './ui/profileStatusView';
-import {
-  ConnectionsViewProvider,
-  TableItem,
-} from './connection/connectionView';
-import { WorkspaceStateConnectionRepository } from './connection/connectionRepository';
-import { QuickPickRegionProvider } from './connection/regionProvider';
+import { ConnectionsViewProvider, TableItem } from './ui/connectionView';
+import { WorkspaceStateConnectionRepository } from './domain/connection/connectionRepository';
+import { QuickPickRegionProvider } from './ui/regionProvider';
 import { SwitchRegionCommandProvider } from './commands/switchRegion';
 import { SwitchProfileCommandProvider } from './commands/switchProfile';
 import { WorkspaceStateProfileRepository } from './domain/profile/profileRepository';
 import { InputBoxProfileProvider } from './ui/inputBoxProfileProvider';
-import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
+import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './ui/workgroupProvider';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
 import { VSCodeStatisticsOutputChannel } from './domain/statistics/statisticsOutputChannel';
 import { QueryParameterSelector } from './ui/queryParameterSelector';

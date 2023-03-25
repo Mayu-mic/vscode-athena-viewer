@@ -1,7 +1,7 @@
 import { commands, Event, EventEmitter, window } from 'vscode';
-import { Connection, defaultWorkgroup } from '../connection/connection';
-import { ConnectionRepository } from '../connection/connectionRepository';
-import { RegionProvider } from '../connection/regionProvider';
+import { Connection, defaultWorkgroup } from '../domain/connection/connection';
+import { ConnectionRepository } from '../domain/connection/connectionRepository';
+import { RegionProvider } from '../ui/regionProvider';
 
 export class SwitchRegionCommandProvider {
   constructor(
