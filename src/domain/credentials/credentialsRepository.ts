@@ -1,5 +1,9 @@
 import * as AWS from '@aws-sdk/types';
-import { GlobalStateRepository } from '../baseRepository';
+import { ExtensionContext } from 'vscode';
+import {
+  MementoStateAccessor,
+  StateAccessor,
+} from '../../infrastracture/stateAccessor';
 
 export interface CredentialsRepository {
   getCredentials(profile: string): AWS.Credentials | undefined;
@@ -7,12 +11,13 @@ export interface CredentialsRepository {
 }
 
 export class WorkspaceStateCredentialsRepository
-  extends GlobalStateRepository
   implements CredentialsRepository
 {
+  constructor(private accessor: StateAccessor<AWS.Credentials>) {}
+
   getCredentials(profile: string): AWS.Credentials | undefined {
     const key = this.getKey(profile);
-    const credentials = this.get<AWS.Credentials>(key);
+    const credentials = this.accessor.get(key);
 
     if (
       credentials &&
@@ -25,10 +30,17 @@ export class WorkspaceStateCredentialsRepository
 
   setCredentials(profile: string, credentials: AWS.Credentials): void {
     const key = this.getKey(profile);
-    this.set(key, credentials);
+    this.accessor.set(key, credentials);
   }
 
   private getKey(profile: string): string {
     return `credentials:${profile}`;
+  }
+
+  static createDefault(
+    ctx: ExtensionContext
+  ): WorkspaceStateCredentialsRepository {
+    const accessor = new MementoStateAccessor<AWS.Credentials>(ctx);
+    return new WorkspaceStateCredentialsRepository(accessor);
   }
 }

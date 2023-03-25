@@ -1,7 +1,7 @@
 import { commands, EventEmitter, window } from 'vscode';
-import { getCredentialProfiles } from '../credentials/getCredentialProfiles';
-import { ProfileProvider } from '../profile/profileProvider';
-import { ProfileRepository } from '../profile/profileRepository';
+import { ProfileProvider } from '../domain/profile/profileProvider';
+import { ProfileRepository } from '../domain/profile/profileRepository';
+import { parseKnownFiles } from '@aws-sdk/shared-ini-file-loader';
 
 export class SwitchProfileCommandProvider {
   constructor(
@@ -13,7 +13,7 @@ export class SwitchProfileCommandProvider {
   readonly onChangeProfileStatus = this._onChangeProfileStatus.event;
 
   async switchProfileCommand() {
-    const candidates = await getCredentialProfiles();
+    const candidates = await this.getCredentialProfiles();
     const profile = await this.profileProvider.provideProfile(candidates);
     if (!profile) {
       return;
@@ -22,5 +22,10 @@ export class SwitchProfileCommandProvider {
     this._onChangeProfileStatus.fire();
     commands.executeCommand('vscode-athena-viewer.refreshConnection');
     window.showInformationMessage('Profile updated!');
+  }
+
+  private async getCredentialProfiles(): Promise<string[]> {
+    const result = await parseKnownFiles({});
+    return Object.keys(result);
   }
 }

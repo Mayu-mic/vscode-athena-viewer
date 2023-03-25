@@ -1,21 +1,16 @@
 import * as AWS from '@aws-sdk/types';
+import { Region } from '../domain/connection/region';
+import {
+  AWSCredentialsProvider,
+  MFACodeNotFoundError,
+} from '../domain/credentials/credentialsProvider';
 import { fromIni } from '@aws-sdk/credential-provider-ini';
 import { AssumeRoleParams } from '@aws-sdk/credential-provider-ini/dist-types/resolveAssumeRoleCredentials';
 import { localeString } from '../i18n';
 import { window } from 'vscode';
-import { Region } from '../connection/region';
 import { FailedAssumeRoleError, STSClientWrapper } from '../sts';
 
-export interface CredentialsProvider {
-  provideCredentials(
-    profile: string,
-    region: Region
-  ): Promise<AWS.Credentials | undefined>;
-}
-
-export class MFACodeNotFoundError extends Error {}
-
-export class AWSCredentialsProvider implements CredentialsProvider {
+export class AWSCredentialsInputBox implements AWSCredentialsProvider {
   async provideCredentials(
     profile: string,
     region: Region

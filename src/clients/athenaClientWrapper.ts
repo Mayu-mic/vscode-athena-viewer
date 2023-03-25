@@ -1,5 +1,4 @@
 import {
-  Athena,
   AthenaClient,
   Column,
   Database,
@@ -23,7 +22,7 @@ import {
 } from '@aws-sdk/client-athena';
 import * as AWS from '@aws-sdk/types';
 import { Event } from 'vscode';
-import { filled } from './util';
+import { filled } from '../util';
 
 export interface QueryResult {
   columns: string[];
@@ -31,7 +30,26 @@ export interface QueryResult {
   statistics?: QueryExecutionStatistics;
 }
 
-export class AthenaClientWrapper {
+export interface AthenaClientWrapper {
+  getDataCatalogs(): Promise<DataCatalogSummary[] | undefined>;
+  getDatabases(catalogName: string): Promise<Database[]>;
+  getTables(
+    catalogName: string,
+    database: string
+  ): Promise<TableMetadata[] | undefined>;
+  getColumns(
+    catalogName: string,
+    database: string,
+    table: string
+  ): Promise<Column[] | undefined>;
+  runQuery(
+    sql: string,
+    workgroup: string,
+    executionParameters: string[]
+  ): Promise<QueryResult | undefined>;
+}
+
+export class DefaultAthenaClientWrapper implements AthenaClientWrapper {
   public onQueryCancelEvent: Event<any> | undefined = undefined;
   private client: AthenaClient;
   private DEFAULT_SLEEP_TIME = 200;

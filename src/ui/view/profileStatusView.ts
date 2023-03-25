@@ -1,7 +1,7 @@
 import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
-import { ProfileRepository } from './profileRepository';
+import { ProfileRepository } from '../../domain/profile/profileRepository';
 
-export class ProfileStatusViewProvider {
+export class ProfileStatusView {
   private item: StatusBarItem;
 
   constructor(private profileRepository: ProfileRepository) {

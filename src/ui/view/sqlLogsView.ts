@@ -6,12 +6,12 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
 } from 'vscode';
-import { truncate } from '../util';
-import { SQLLog } from './sqlLog';
-import { ISQLLogRepository } from './sqlLogRepository';
+import { truncate } from '../../util';
+import { SQLLog } from '../../domain/sqlLog/sqlLog';
+import { SQLLogRepository } from '../../domain/sqlLog/sqlLogRepository';
 
 export class SQLLogsViewProvider implements TreeDataProvider<SQLLogItem> {
-  constructor(private sqlLogsRepository: ISQLLogRepository) {}
+  constructor(private sqlLogsRepository: SQLLogRepository) {}
 
   private _onDidChangeTreeData: EventEmitter<void> = new EventEmitter();
   readonly onDidChangeTreeData: Event<void> = this._onDidChangeTreeData.event;
