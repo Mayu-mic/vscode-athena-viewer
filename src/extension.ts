@@ -21,7 +21,7 @@ import { WorkspaceStateProfileRepository } from './profile/profileRepository';
 import { InputBoxProfileProvider } from './profile/profileProvider';
 import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
-import { VSCodeStatisticsOutputChannel } from './output/statisticsOutputChannel';
+import { VSCodeStatisticsOutputChannel } from './domain/statistics/statisticsOutputChannel';
 import { QueryParameterSelector } from './queryParameter/queryParameterSelector';
 import { WorkspaceStateQueryParameterRepository } from './queryParameter/queryParameterRepository';
 import { DefaultQueryRunner, QueryRunner } from './commands/queryRunner';
