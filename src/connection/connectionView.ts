@@ -2,6 +2,7 @@ import {
   Database,
   DataCatalogSummary,
   TableMetadata,
+  Column,
 } from '@aws-sdk/client-athena';
 import {
   Event,
@@ -54,6 +55,9 @@ export class ConnectionsViewProvider
     } else if (element && element instanceof DatabaseItem) {
       // Table
       return this.getTables(element);
+    } else if (element && element instanceof TableItem) {
+      // Column
+      return this.getColumns(element);
     } else {
       // Connection
       return this.getConnection();
@@ -127,8 +131,28 @@ export class ConnectionsViewProvider
         .filter((t) => t.Name)
         .map(
           (table) =>
-            new TableItem(table, TreeItemCollapsibleState.None, database)
+            new TableItem(table, TreeItemCollapsibleState.Collapsed, database)
         );
+    } else {
+      return [];
+    }
+  }
+
+  private async getColumns(table: TableItem): Promise<ColumnItem[]> {
+    const region = table.parent.parent.parent.connection.region;
+    const dataCatalogName = table.parent.parent.dataCatalog.CatalogName!;
+    const databaseName = table.parent.database.Name!;
+    const tableName = table.table.Name!;
+    const client = await this.getClient(region);
+    const columns = await client?.getColumns(
+      dataCatalogName,
+      databaseName,
+      tableName
+    );
+    if (columns) {
+      return columns.map(
+        (column) => new ColumnItem(column, TreeItemCollapsibleState.None, table)
+      );
     } else {
       return [];
     }
@@ -201,5 +225,18 @@ export class TableItem extends DependencyElement {
   ) {
     super(table.Name!, collapsibleState);
     this.contextValue = 'table';
+  }
+}
+
+class ColumnItem extends DependencyElement {
+  constructor(
+    public readonly column: Column,
+    public readonly collapsibleState: TreeItemCollapsibleState,
+    public readonly parent: TableItem
+  ) {
+    super(column.Name!, collapsibleState);
+    this.contextValue = 'column';
+    this.label = column.Name;
+    this.description = column.Type;
   }
 }
