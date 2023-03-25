@@ -5,23 +5,23 @@ import { QueryCommandProvider } from './commands/queryCommandProvider';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
 import { WorkspaceStateCredentialsRepository } from './domain/credentials/credentialsRepository';
 import { WorkspaceStateSQLLogRepository } from './domain/sqlLog/sqlLogRepository';
-import { SQLLogItem, SQLLogsViewProvider } from './ui/sqlLogsView';
+import { SQLLogItem, SQLLogsViewProvider } from './ui/view/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
-import { ProfileStatusViewProvider } from './ui/profileStatusView';
-import { ConnectionsViewProvider, TableItem } from './ui/connectionView';
+import { ProfileStatusView } from './ui/view/profileStatusView';
+import { ConnectionsViewProvider, TableItem } from './ui/view/connectionsView';
 import { WorkspaceStateConnectionRepository } from './domain/connection/connectionRepository';
-import { QuickPickRegionProvider } from './ui/regionProvider';
+import { RegionQuickPick } from './ui/regionQuickPick';
 import { SwitchRegionCommandProvider } from './commands/switchRegion';
 import { SwitchProfileCommandProvider } from './commands/switchProfile';
 import { WorkspaceStateProfileRepository } from './domain/profile/profileRepository';
-import { InputBoxProfileProvider } from './ui/inputBoxProfileProvider';
-import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './ui/workgroupProvider';
+import { ProfileInputBox } from './ui/profileInputBox';
+import { WorkgroupInputBox as WorkgroupInputBox } from './ui/workgroupInputBox';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
 import { VSCodeStatisticsOutputChannel } from './domain/statistics/statisticsOutputChannel';
 import { QueryParameterSelector } from './ui/queryParameterSelector';
 import { WorkspaceStateQueryParameterRepository } from './domain/queryParameter/queryParameterRepository';
 import { DefaultQueryRunner, QueryRunner } from './commands/queryRunner';
-import { VSCodeAWSCredentialsProvider } from './ui/awsCredentialsProvider';
+import { AWSCredentialsInputBox } from './ui/awsCredentialsInputBox';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
     WorkspaceStateProfileRepository.craeteDefault(context);
   const credentialsRepository =
     WorkspaceStateCredentialsRepository.createDefault(context);
-  const credentialsProvider = new VSCodeAWSCredentialsProvider();
+  const credentialsProvider = new AWSCredentialsInputBox();
   const connectionView = new ConnectionsViewProvider(
     connectionRepository,
     profileRepository,
@@ -65,24 +65,22 @@ export function activate(context: vscode.ExtensionContext) {
   );
   const queryCommandProvider = new QueryCommandProvider(queryRunner);
 
-  const profileProvider = new InputBoxProfileProvider();
+  const profileProvider = new ProfileInputBox();
   const switchProfileCommandProvider = new SwitchProfileCommandProvider(
     profileRepository,
     profileProvider
   );
-  const profileStatusViewProvider = new ProfileStatusViewProvider(
-    profileRepository
-  );
+  const profileStatusViewProvider = new ProfileStatusView(profileRepository);
   switchProfileCommandProvider.onChangeProfileStatus(() => {
     profileStatusViewProvider.refresh();
   });
-  const regionsProvider = new QuickPickRegionProvider();
+  const regionsProvider = new RegionQuickPick();
   const switchRegionCommandProvider = new SwitchRegionCommandProvider(
     connectionRepository,
     regionsProvider
   );
 
-  const workgroupProvider = new InputBoxWorkgroupProvider(connectionRepository);
+  const workgroupProvider = new WorkgroupInputBox(connectionRepository);
   const inputWorkgroupCommandProvider = new InputWorkgroupCommandProvider(
     workgroupProvider,
     connectionRepository

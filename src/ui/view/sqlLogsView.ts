@@ -6,9 +6,9 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
 } from 'vscode';
-import { truncate } from '../util';
-import { SQLLog } from '../domain/sqlLog/sqlLog';
-import { SQLLogRepository } from '../domain/sqlLog/sqlLogRepository';
+import { truncate } from '../../util';
+import { SQLLog } from '../../domain/sqlLog/sqlLog';
+import { SQLLogRepository } from '../../domain/sqlLog/sqlLogRepository';
 
 export class SQLLogsViewProvider implements TreeDataProvider<SQLLogItem> {
   constructor(private sqlLogsRepository: SQLLogRepository) {}

@@ -1,11 +1,8 @@
 import { QuickPickItem, window } from 'vscode';
 import { Region, regions } from '../domain/connection/region';
+import { RegionProvider } from '../domain/connection/regionProvider';
 
-export interface RegionProvider {
-  provideRegion(): Promise<Region | undefined>;
-}
-
-export class QuickPickRegionProvider implements RegionProvider {
+export class RegionQuickPick implements RegionProvider {
   async provideRegion(): Promise<Region | undefined> {
     const items: QuickPickItem[] = regions.map((region) => ({
       label: region.label,

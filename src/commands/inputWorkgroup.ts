@@ -1,6 +1,6 @@
 import { commands, window } from 'vscode';
 import { ConnectionRepository } from '../domain/connection/connectionRepository';
-import { WorkgroupProvider } from '../ui/workgroupProvider';
+import { WorkgroupProvider } from '../domain/connection/workgroupProvider';
 
 export class InputWorkgroupCommandProvider {
   constructor(

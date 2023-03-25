@@ -16,14 +16,14 @@ import {
 import {
   AthenaClientWrapper,
   DefaultAthenaClientWrapper,
-} from '../clients/athenaClientWrapper';
-import { AWSCredentialsProvider } from '../domain/credentials/credentialsProvider';
-import { CredentialsRepository } from '../domain/credentials/credentialsRepository';
-import { localeString } from '../i18n';
-import { ProfileRepository } from '../domain/profile/profileRepository';
-import { Connection } from '../domain/connection/connection';
-import { ConnectionRepository } from '../domain/connection/connectionRepository';
-import { Region } from '../domain/connection/region';
+} from '../../clients/athenaClientWrapper';
+import { AWSCredentialsProvider } from '../../domain/credentials/credentialsProvider';
+import { CredentialsRepository } from '../../domain/credentials/credentialsRepository';
+import { localeString } from '../../i18n';
+import { ProfileRepository } from '../../domain/profile/profileRepository';
+import { Connection } from '../../domain/connection/connection';
+import { ConnectionRepository } from '../../domain/connection/connectionRepository';
+import { Region } from '../../domain/connection/region';
 
 export class ConnectionsViewProvider
   implements TreeDataProvider<DependencyElement>

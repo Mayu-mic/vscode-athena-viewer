@@ -2,7 +2,7 @@ import { window } from 'vscode';
 import { Profile } from '../domain/profile/profile';
 import { ProfileProvider } from '../domain/profile/profileProvider';
 
-export class InputBoxProfileProvider implements ProfileProvider {
+export class ProfileInputBox implements ProfileProvider {
   async provideProfile(candidates: string[]): Promise<Profile | undefined> {
     const result = await window.showQuickPick(candidates, {
       title: 'AWS Profile?',

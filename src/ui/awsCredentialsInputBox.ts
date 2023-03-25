@@ -10,7 +10,7 @@ import { localeString } from '../i18n';
 import { window } from 'vscode';
 import { FailedAssumeRoleError, STSClientWrapper } from '../sts';
 
-export class VSCodeAWSCredentialsProvider implements AWSCredentialsProvider {
+export class AWSCredentialsInputBox implements AWSCredentialsProvider {
   async provideCredentials(
     profile: string,
     region: Region
