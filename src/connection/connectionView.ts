@@ -13,7 +13,10 @@ import {
   TreeItemCollapsibleState,
   window,
 } from 'vscode';
-import { AthenaClientWrapper } from '../athena';
+import {
+  AthenaClientWrapper,
+  DefaultAthenaClientWrapper,
+} from '../clients/athenaClientWrapper';
 import { CredentialsProvider } from '../credentials/credentialsProvider';
 import { CredentialsRepository } from '../credentials/credentialsRepository';
 import { localeString } from '../i18n';
@@ -177,7 +180,7 @@ export class ConnectionsViewProvider
       }
       this.credentialsRepository.setCredentials(profile.id, credentials);
     }
-    return new AthenaClientWrapper(region.id, credentials);
+    return new DefaultAthenaClientWrapper(region.id, credentials);
   }
 }
 

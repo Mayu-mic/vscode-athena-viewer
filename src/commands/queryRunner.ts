@@ -11,7 +11,10 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { AthenaClientWrapper, QueryResult } from '../athena';
+import {
+  DefaultAthenaClientWrapper,
+  QueryResult,
+} from '../clients/athenaClientWrapper';
 import { Connection } from '../connection/connection';
 import { ConnectionRepository } from '../connection/connectionRepository';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
@@ -87,7 +90,10 @@ export class DefaultQueryRunner implements QueryRunner {
     connection: Connection,
     credentials: AWS.Credentials
   ): Promise<QueryResult | undefined> {
-    const client = new AthenaClientWrapper(connection.region.id, credentials);
+    const client = new DefaultAthenaClientWrapper(
+      connection.region.id,
+      credentials
+    );
 
     return await window.withProgress(
       {
