@@ -1,23 +1,21 @@
 import { ExtensionContext } from 'vscode';
-import { GlobalStateRepository } from '../baseRepository';
+import {
+  MementoStateAccessor,
+  StateAccessor,
+} from '../infrastracture/stateAccessor';
 import { SQLLog, SQLLogJson } from './sqlLog';
 
-export interface ISQLLogRepository {
+export interface SQLLogRepository {
   add(sqlLog: SQLLog): void;
   delete(id: string): void;
   list(): SQLLog[];
   clear(): void;
 }
 
-export class SQLLogWorkspaceRepository
-  extends GlobalStateRepository
-  implements ISQLLogRepository
-{
+export class WorkspaceStateSQLLogRepository implements SQLLogRepository {
   private KEY = 'sql-logs';
 
-  constructor(ctx: ExtensionContext) {
-    super(ctx);
-  }
+  constructor(private accessor: StateAccessor<SQLLogJson[]>) {}
 
   add(sqlLog: SQLLog): void {
     const logs = this.getSQLLogs();
@@ -40,7 +38,7 @@ export class SQLLogWorkspaceRepository
   }
 
   private getSQLLogs(): SQLLog[] {
-    const logs = this.get<SQLLogJson[]>(this.KEY) ?? [];
+    const logs = this.accessor.get(this.KEY) ?? [];
     return logs.map((log) => ({
       ...log,
       loggedDate: new Date(log.loggedDate),
@@ -52,6 +50,11 @@ export class SQLLogWorkspaceRepository
       ...log,
       loggedDate: log.loggedDate.getTime(),
     }));
-    this.set<SQLLogJson[]>(this.KEY, json);
+    this.accessor.set(this.KEY, json);
+  }
+
+  static createDefault(ctx: ExtensionContext): WorkspaceStateSQLLogRepository {
+    const accessor = new MementoStateAccessor<SQLLogJson[]>(ctx);
+    return new WorkspaceStateSQLLogRepository(accessor);
   }
 }

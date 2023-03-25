@@ -5,7 +5,7 @@ import { QueryCommandProvider } from './commands/queryCommandProvider';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
 import { WorkspaceStateCredentialsRepository } from './credentials/credentialsRepository';
 import { AWSCredentialsProvider } from './credentials/credentialsProvider';
-import { SQLLogWorkspaceRepository } from './sqlLog/sqlLogRepository';
+import { WorkspaceStateSQLLogRepository } from './sqlLog/sqlLogRepository';
 import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
 import { ProfileStatusViewProvider } from './profile/profileStatusView';
@@ -33,11 +33,12 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
 
-  const connectionRepository = new WorkspaceStateConnectionRepository(context);
-  const profileRepository = new WorkspaceStateProfileRepository(context);
-  const credentialsRepository = new WorkspaceStateCredentialsRepository(
-    context
-  );
+  const connectionRepository =
+    WorkspaceStateConnectionRepository.createDefault(context);
+  const profileRepository =
+    WorkspaceStateProfileRepository.craeteDefault(context);
+  const credentialsRepository =
+    WorkspaceStateCredentialsRepository.createDefault(context);
   const credentialsProvider = new AWSCredentialsProvider();
   const connectionView = new ConnectionsViewProvider(
     connectionRepository,
@@ -46,13 +47,13 @@ export function activate(context: vscode.ExtensionContext) {
     credentialsProvider
   );
 
-  const sqlLogsRepository = new SQLLogWorkspaceRepository(context);
+  const sqlLogsRepository =
+    WorkspaceStateSQLLogRepository.createDefault(context);
   const sqlLogsView = new SQLLogsViewProvider(sqlLogsRepository);
 
   const outputChannel = new VSCodeStatisticsOutputChannel();
-  const queryParameterRepository = new WorkspaceStateQueryParameterRepository(
-    context
-  );
+  const queryParameterRepository =
+    WorkspaceStateQueryParameterRepository.createDefault(context);
   const queryParameterSelector = new QueryParameterSelector(
     queryParameterRepository
   );

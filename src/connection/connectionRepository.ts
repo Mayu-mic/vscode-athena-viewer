@@ -1,5 +1,9 @@
-import { GlobalStateRepository } from '../baseRepository';
+import {
+  MementoStateAccessor,
+  StateAccessor,
+} from '../infrastracture/stateAccessor';
 import { Connection } from './connection';
+import { ExtensionContext } from 'vscode';
 
 export interface ConnectionRepository {
   getConnection(): Connection | undefined;
@@ -7,16 +11,24 @@ export interface ConnectionRepository {
 }
 
 export class WorkspaceStateConnectionRepository
-  extends GlobalStateRepository
   implements ConnectionRepository
 {
   private KEY = 'connection';
 
+  constructor(private accessor: StateAccessor<Connection>) {}
+
   getConnection(): Connection | undefined {
-    return this.get<Connection>(this.KEY);
+    return this.accessor.get(this.KEY);
   }
 
   setConnection(connection: Connection): void {
-    this.set(this.KEY, connection);
+    this.accessor.set(this.KEY, connection);
+  }
+
+  static createDefault(
+    ctx: ExtensionContext
+  ): WorkspaceStateConnectionRepository {
+    const accessor = new MementoStateAccessor<Connection>(ctx);
+    return new WorkspaceStateConnectionRepository(accessor);
   }
 }

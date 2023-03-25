@@ -26,7 +26,7 @@ import { ProfileRepository } from '../profile/profileRepository';
 import { QueryParameter } from '../queryParameter/queryParameter';
 import { QueryParameterSelector } from '../queryParameter/queryParameterSelector';
 import { SQLLog } from '../sqlLog/sqlLog';
-import { ISQLLogRepository } from '../sqlLog/sqlLogRepository';
+import { SQLLogRepository } from '../sqlLog/sqlLogRepository';
 import { isParameterizedQuery } from '../util';
 
 export interface QueryRunner {
@@ -42,7 +42,7 @@ export class DefaultQueryRunner implements QueryRunner {
     private credentialsProvider: CredentialsProvider,
     private statisticsOutputChannel: StatisticsOutputChannel,
     private queryParameterSelector: QueryParameterSelector,
-    private sqlLogRepository: ISQLLogRepository
+    private sqlLogRepository: SQLLogRepository
   ) {}
 
   async runQuery(query: string, addLog = false): Promise<void> {

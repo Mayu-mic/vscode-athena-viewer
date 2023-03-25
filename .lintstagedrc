@@ -1,6 +1,6 @@
 {
   "*.ts": [
     "eslint src --ext ts",
-    "tsc --noEmit"
+    "bash -c 'npm run lint:tsc'"
   ]
 }
