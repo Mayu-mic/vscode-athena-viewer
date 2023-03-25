@@ -4,8 +4,8 @@ import * as vscode from 'vscode';
 import { QueryCommandProvider } from './commands/queryCommandProvider';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
 import { WorkspaceStateCredentialsRepository } from './domain/credentials/credentialsRepository';
-import { WorkspaceStateSQLLogRepository } from './sqlLog/sqlLogRepository';
-import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
+import { WorkspaceStateSQLLogRepository } from './domain/sqlLog/sqlLogRepository';
+import { SQLLogItem, SQLLogsViewProvider } from './ui/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
 import { ProfileStatusViewProvider } from './ui/profileStatusView';
 import {

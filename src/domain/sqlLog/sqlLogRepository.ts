@@ -2,7 +2,7 @@ import { ExtensionContext } from 'vscode';
 import {
   MementoStateAccessor,
   StateAccessor,
-} from '../infrastracture/stateAccessor';
+} from '../../infrastracture/stateAccessor';
 import { SQLLog, SQLLogJson } from './sqlLog';
 
 export interface SQLLogRepository {

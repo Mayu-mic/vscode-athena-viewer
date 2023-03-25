@@ -25,8 +25,8 @@ import { StatisticsOutputChannel } from '../domain/statistics/statisticsOutputCh
 import { ProfileRepository } from '../domain/profile/profileRepository';
 import { QueryParameter } from '../domain/queryParameter/queryParameter';
 import { QueryParameterSelector } from '../ui/queryParameterSelector';
-import { SQLLog } from '../sqlLog/sqlLog';
-import { SQLLogRepository } from '../sqlLog/sqlLogRepository';
+import { SQLLog } from '../domain/sqlLog/sqlLog';
+import { SQLLogRepository } from '../domain/sqlLog/sqlLogRepository';
 import { isParameterizedQuery } from '../util';
 
 export interface QueryRunner {
