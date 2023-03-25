@@ -17,8 +17,8 @@ import {
   AthenaClientWrapper,
   DefaultAthenaClientWrapper,
 } from '../clients/athenaClientWrapper';
-import { CredentialsProvider } from '../credentials/credentialsProvider';
-import { CredentialsRepository } from '../credentials/credentialsRepository';
+import { CredentialsProvider } from '../domain/credentials/credentialsProvider';
+import { CredentialsRepository } from '../domain/credentials/credentialsRepository';
 import { localeString } from '../i18n';
 import { ProfileRepository } from '../profile/profileRepository';
 import { Connection } from './connection';

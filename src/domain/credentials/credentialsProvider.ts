@@ -1,10 +1,10 @@
 import * as AWS from '@aws-sdk/types';
 import { fromIni } from '@aws-sdk/credential-provider-ini';
 import { AssumeRoleParams } from '@aws-sdk/credential-provider-ini/dist-types/resolveAssumeRoleCredentials';
-import { localeString } from '../i18n';
+import { localeString } from '../../i18n';
 import { window } from 'vscode';
-import { Region } from '../connection/region';
-import { FailedAssumeRoleError, STSClientWrapper } from '../sts';
+import { Region } from '../../connection/region';
+import { FailedAssumeRoleError, STSClientWrapper } from '../../sts';
 
 export interface CredentialsProvider {
   provideCredentials(

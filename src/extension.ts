@@ -3,8 +3,8 @@
 import * as vscode from 'vscode';
 import { QueryCommandProvider } from './commands/queryCommandProvider';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
-import { WorkspaceStateCredentialsRepository } from './credentials/credentialsRepository';
-import { AWSCredentialsProvider } from './credentials/credentialsProvider';
+import { WorkspaceStateCredentialsRepository } from './domain/credentials/credentialsRepository';
+import { AWSCredentialsProvider } from './domain/credentials/credentialsProvider';
 import { WorkspaceStateSQLLogRepository } from './sqlLog/sqlLogRepository';
 import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
