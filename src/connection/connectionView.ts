@@ -17,7 +17,7 @@ import {
   AthenaClientWrapper,
   DefaultAthenaClientWrapper,
 } from '../clients/athenaClientWrapper';
-import { CredentialsProvider } from '../domain/credentials/credentialsProvider';
+import { AWSCredentialsProvider } from '../domain/credentials/credentialsProvider';
 import { CredentialsRepository } from '../domain/credentials/credentialsRepository';
 import { localeString } from '../i18n';
 import { ProfileRepository } from '../domain/profile/profileRepository';
@@ -35,7 +35,7 @@ export class ConnectionsViewProvider
     private connectionRepository: ConnectionRepository,
     private profileRepository: ProfileRepository,
     private credentialsRepository: CredentialsRepository,
-    private credentialsProvider: CredentialsProvider
+    private credentialsProvider: AWSCredentialsProvider
   ) {}
 
   refresh(): void {

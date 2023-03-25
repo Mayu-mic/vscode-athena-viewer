@@ -18,13 +18,13 @@ import {
 import { Connection } from '../connection/connection';
 import { ConnectionRepository } from '../connection/connectionRepository';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
-import { CredentialsProvider } from '../domain/credentials/credentialsProvider';
+import { AWSCredentialsProvider } from '../domain/credentials/credentialsProvider';
 import { CredentialsRepository } from '../domain/credentials/credentialsRepository';
 import { localeString } from '../i18n';
 import { StatisticsOutputChannel } from '../domain/statistics/statisticsOutputChannel';
 import { ProfileRepository } from '../domain/profile/profileRepository';
-import { QueryParameter } from '../queryParameter/queryParameter';
-import { QueryParameterSelector } from '../queryParameter/queryParameterSelector';
+import { QueryParameter } from '../domain/queryParameter/queryParameter';
+import { QueryParameterSelector } from '../ui/queryParameterSelector';
 import { SQLLog } from '../sqlLog/sqlLog';
 import { SQLLogRepository } from '../sqlLog/sqlLogRepository';
 import { isParameterizedQuery } from '../util';
@@ -39,7 +39,7 @@ export class DefaultQueryRunner implements QueryRunner {
     private connectionsRepository: ConnectionRepository,
     private profileRespository: ProfileRepository,
     private credentialsRepository: CredentialsRepository,
-    private credentialsProvider: CredentialsProvider,
+    private credentialsProvider: AWSCredentialsProvider,
     private statisticsOutputChannel: StatisticsOutputChannel,
     private queryParameterSelector: QueryParameterSelector,
     private sqlLogRepository: SQLLogRepository

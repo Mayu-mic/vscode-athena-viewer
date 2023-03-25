@@ -4,11 +4,10 @@ import * as vscode from 'vscode';
 import { QueryCommandProvider } from './commands/queryCommandProvider';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
 import { WorkspaceStateCredentialsRepository } from './domain/credentials/credentialsRepository';
-import { AWSCredentialsProvider } from './domain/credentials/credentialsProvider';
 import { WorkspaceStateSQLLogRepository } from './sqlLog/sqlLogRepository';
 import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
-import { ProfileStatusViewProvider } from './domain/profile/profileStatusView';
+import { ProfileStatusViewProvider } from './ui/profileStatusView';
 import {
   ConnectionsViewProvider,
   TableItem,
@@ -18,13 +17,14 @@ import { QuickPickRegionProvider } from './connection/regionProvider';
 import { SwitchRegionCommandProvider } from './commands/switchRegion';
 import { SwitchProfileCommandProvider } from './commands/switchProfile';
 import { WorkspaceStateProfileRepository } from './domain/profile/profileRepository';
-import { InputBoxProfileProvider } from './domain/profile/profileProvider';
+import { InputBoxProfileProvider } from './ui/inputBoxProfileProvider';
 import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
 import { VSCodeStatisticsOutputChannel } from './domain/statistics/statisticsOutputChannel';
-import { QueryParameterSelector } from './queryParameter/queryParameterSelector';
-import { WorkspaceStateQueryParameterRepository } from './queryParameter/queryParameterRepository';
+import { QueryParameterSelector } from './ui/queryParameterSelector';
+import { WorkspaceStateQueryParameterRepository } from './domain/queryParameter/queryParameterRepository';
 import { DefaultQueryRunner, QueryRunner } from './commands/queryRunner';
+import { VSCodeAWSCredentialsProvider } from './ui/awsCredentialsProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -39,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
     WorkspaceStateProfileRepository.craeteDefault(context);
   const credentialsRepository =
     WorkspaceStateCredentialsRepository.createDefault(context);
-  const credentialsProvider = new AWSCredentialsProvider();
+  const credentialsProvider = new VSCodeAWSCredentialsProvider();
   const connectionView = new ConnectionsViewProvider(
     connectionRepository,
     profileRepository,

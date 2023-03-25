@@ -2,7 +2,7 @@ import { ExtensionContext } from 'vscode';
 import {
   MementoStateAccessor,
   StateAccessor,
-} from '../infrastracture/stateAccessor';
+} from '../../infrastracture/stateAccessor';
 import { QueryParameter } from './queryParameter';
 
 export interface QueryParameterRepository {
