@@ -15,13 +15,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:vscode-athena-viewer.runQuery",
-    "onCommand:vscode-athena-viewer.switchRegion",
-    "onCommand:vscode-athena-viewer.switchProfile",
-    "onView:view-connection",
-    "onView:view-sql-logs"
-  ],
   "main": "./out/src/extension.js",
   "contributes": {
     "commands": [
