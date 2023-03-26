@@ -231,7 +231,7 @@ export class TableItem extends DependencyElement {
   }
 }
 
-class ColumnItem extends DependencyElement {
+export class ColumnItem extends DependencyElement {
   constructor(
     public readonly column: Column,
     public readonly collapsibleState: TreeItemCollapsibleState,
