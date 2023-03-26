@@ -73,6 +73,10 @@
       {
         "command": "vscode-athena-viewer.copyTableName",
         "title": "%copy-table-name-title%"
+      },
+      {
+        "command": "vscode-athena-viewer.copyColumnName",
+        "title": "%copy-column-name-title%"
       }
     ],
     "submenus": [
@@ -141,6 +145,10 @@
         {
           "command": "vscode-athena-viewer.copyTableName",
           "when": "view == view-connection && viewItem == table"
+        },
+        {
+          "command": "vscode-athena-viewer.copyColumnName",
+          "when": "view == view-connection && viewItem == column"
         },
         {
           "command": "vscode-athena-viewer.runSQLLog",

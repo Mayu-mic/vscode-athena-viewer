@@ -8,7 +8,11 @@ import { WorkspaceStateSQLLogRepository } from './domain/sqlLog/sqlLogRepository
 import { SQLLogItem, SQLLogsViewProvider } from './ui/view/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
 import { ProfileStatusView } from './ui/view/profileStatusView';
-import { ConnectionsViewProvider, TableItem } from './ui/view/connectionsView';
+import {
+  ColumnItem,
+  ConnectionsViewProvider,
+  TableItem,
+} from './ui/view/connectionsView';
 import { WorkspaceStateConnectionRepository } from './domain/connection/connectionRepository';
 import { RegionQuickPick } from './ui/regionQuickPick';
 import { SwitchRegionCommandProvider } from './commands/switchRegion';
@@ -122,6 +126,16 @@ export function activate(context: vscode.ExtensionContext) {
       (item: TableItem) => {
         const text = `"${item.parent.database.Name}"."${item.table.Name}"`;
         vscode.env.clipboard.writeText(text);
+      }
+    ),
+    vscode.commands.registerCommand(
+      'vscode-athena-viewer.copyColumnName',
+      (item: ColumnItem) => {
+        const columnName = item.column.Name;
+        if (columnName) {
+          const text = `"${columnName}"`;
+          vscode.env.clipboard.writeText(text);
+        }
       }
     ),
     vscode.commands.registerCommand(
