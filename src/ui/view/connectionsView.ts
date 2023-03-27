@@ -13,14 +13,17 @@ import {
   TreeItemCollapsibleState,
   window,
 } from 'vscode';
-import { AthenaClientWrapper } from '../athena';
-import { CredentialsProvider } from '../credentials/credentialsProvider';
-import { CredentialsRepository } from '../credentials/credentialsRepository';
-import { localeString } from '../i18n';
-import { ProfileRepository } from '../profile/profileRepository';
-import { Connection } from './connection';
-import { ConnectionRepository } from './connectionRepository';
-import { Region } from './region';
+import {
+  AthenaClientWrapper,
+  DefaultAthenaClientWrapper,
+} from '../../clients/athenaClientWrapper';
+import { AWSCredentialsProvider } from '../../domain/credentials/credentialsProvider';
+import { CredentialsRepository } from '../../domain/credentials/credentialsRepository';
+import { localeString } from '../../i18n';
+import { ProfileRepository } from '../../domain/profile/profileRepository';
+import { Connection } from '../../domain/connection/connection';
+import { ConnectionRepository } from '../../domain/connection/connectionRepository';
+import { Region } from '../../domain/connection/region';
 
 export class ConnectionsViewProvider
   implements TreeDataProvider<DependencyElement>
@@ -32,7 +35,7 @@ export class ConnectionsViewProvider
     private connectionRepository: ConnectionRepository,
     private profileRepository: ProfileRepository,
     private credentialsRepository: CredentialsRepository,
-    private credentialsProvider: CredentialsProvider
+    private credentialsProvider: AWSCredentialsProvider
   ) {}
 
   refresh(): void {
@@ -177,7 +180,7 @@ export class ConnectionsViewProvider
       }
       this.credentialsRepository.setCredentials(profile.id, credentials);
     }
-    return new AthenaClientWrapper(region.id, credentials);
+    return new DefaultAthenaClientWrapper(region.id, credentials);
   }
 }
 
@@ -228,7 +231,7 @@ export class TableItem extends DependencyElement {
   }
 }
 
-class ColumnItem extends DependencyElement {
+export class ColumnItem extends DependencyElement {
   constructor(
     public readonly column: Column,
     public readonly collapsibleState: TreeItemCollapsibleState,

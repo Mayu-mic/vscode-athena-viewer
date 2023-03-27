@@ -1,6 +1,6 @@
 import { QuickPickItem, window } from 'vscode';
-import { QueryParameter } from './queryParameter';
-import { QueryParameterRepository } from './queryParameterRepository';
+import { QueryParameter } from '../domain/queryParameter/queryParameter';
+import { QueryParameterRepository } from '../domain/queryParameter/queryParameterRepository';
 
 export class QueryParameterSelector {
   constructor(private repository: QueryParameterRepository) {}

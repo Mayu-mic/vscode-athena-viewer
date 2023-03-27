@@ -1,4 +1,8 @@
-import { GlobalStateRepository } from '../baseRepository';
+import { ExtensionContext } from 'vscode';
+import {
+  MementoStateAccessor,
+  StateAccessor,
+} from '../../infrastracture/stateAccessor';
 import { QueryParameter } from './queryParameter';
 
 export interface QueryParameterRepository {
@@ -8,11 +12,12 @@ export interface QueryParameterRepository {
 }
 
 export class WorkspaceStateQueryParameterRepository
-  extends GlobalStateRepository
   implements QueryParameterRepository
 {
   private PARAMETER_KEY = 'queryParameters';
   private MAX_PARAMETERS = 20;
+
+  constructor(private accessor: StateAccessor<QueryParameter[]>) {}
 
   addParameter(parameter: QueryParameter): void {
     if (parameter.items.length === 0) {
@@ -26,14 +31,21 @@ export class WorkspaceStateQueryParameterRepository
       parameters.pop();
     }
 
-    this.set(this.PARAMETER_KEY, parameters);
+    this.accessor.set(this.PARAMETER_KEY, parameters);
   }
 
   getParameters(): QueryParameter[] {
-    return this.get<QueryParameter[]>(this.PARAMETER_KEY) || [];
+    return this.accessor.get(this.PARAMETER_KEY) || [];
   }
 
   clear(): void {
-    this.delete(this.PARAMETER_KEY);
+    this.accessor.delete(this.PARAMETER_KEY);
+  }
+
+  static createDefault(
+    ctx: ExtensionContext
+  ): WorkspaceStateQueryParameterRepository {
+    const accessor = new MementoStateAccessor<QueryParameter[]>(ctx);
+    return new WorkspaceStateQueryParameterRepository(accessor);
   }
 }

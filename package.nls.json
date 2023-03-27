@@ -4,6 +4,7 @@
   "switch-profile-title": "Amazon Athena: Switch Profile",
   "input-workgroup-title": "Amazon Athena: Change Workgroup",
   "copy-table-name-title": "Copy table name",
+  "copy-column-name-title": "Copy column name",
   "profile-not-found": "Profile not found.",
   "connection-not-found": "Connection not found.",
   "mfa-code-not-found": "Authentication code not found.",

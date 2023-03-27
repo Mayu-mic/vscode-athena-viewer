@@ -3,28 +3,29 @@
 import * as vscode from 'vscode';
 import { QueryCommandProvider } from './commands/queryCommandProvider';
 import { PREVIEW_DOCUMENT_SCHEME } from './constants';
-import { WorkspaceStateCredentialsRepository } from './credentials/credentialsRepository';
-import { AWSCredentialsProvider } from './credentials/credentialsProvider';
-import { SQLLogWorkspaceRepository } from './sqlLog/sqlLogRepository';
-import { SQLLogItem, SQLLogsViewProvider } from './sqlLog/sqlLogsView';
+import { WorkspaceStateCredentialsRepository } from './domain/credentials/credentialsRepository';
+import { WorkspaceStateSQLLogRepository } from './domain/sqlLog/sqlLogRepository';
+import { SQLLogItem, SQLLogsViewProvider } from './ui/view/sqlLogsView';
 import { AthenaTableViewer } from './ui/tableViewer';
-import { ProfileStatusViewProvider } from './profile/profileStatusView';
+import { ProfileStatusView } from './ui/view/profileStatusView';
 import {
+  ColumnItem,
   ConnectionsViewProvider,
   TableItem,
-} from './connection/connectionView';
-import { WorkspaceStateConnectionRepository } from './connection/connectionRepository';
-import { QuickPickRegionProvider } from './connection/regionProvider';
+} from './ui/view/connectionsView';
+import { WorkspaceStateConnectionRepository } from './domain/connection/connectionRepository';
+import { RegionQuickPick } from './ui/regionQuickPick';
 import { SwitchRegionCommandProvider } from './commands/switchRegion';
 import { SwitchProfileCommandProvider } from './commands/switchProfile';
-import { WorkspaceStateProfileRepository } from './profile/profileRepository';
-import { InputBoxProfileProvider } from './profile/profileProvider';
-import { InputBoxWorkgroupProvider as InputBoxWorkgroupProvider } from './connection/workgroupProvider';
+import { WorkspaceStateProfileRepository } from './domain/profile/profileRepository';
+import { ProfileInputBox } from './ui/profileInputBox';
+import { WorkgroupInputBox as WorkgroupInputBox } from './ui/workgroupInputBox';
 import { InputWorkgroupCommandProvider as InputWorkgroupCommandProvider } from './commands/inputWorkgroup';
-import { VSCodeStatisticsOutputChannel } from './output/statisticsOutputChannel';
-import { QueryParameterSelector } from './queryParameter/queryParameterSelector';
-import { WorkspaceStateQueryParameterRepository } from './queryParameter/queryParameterRepository';
+import { VSCodeStatisticsOutputChannel } from './domain/statistics/statisticsOutputChannel';
+import { QueryParameterSelector } from './ui/queryParameterSelector';
+import { WorkspaceStateQueryParameterRepository } from './domain/queryParameter/queryParameterRepository';
 import { DefaultQueryRunner, QueryRunner } from './commands/queryRunner';
+import { AWSCredentialsInputBox } from './ui/awsCredentialsInputBox';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -33,12 +34,13 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
 
-  const connectionRepository = new WorkspaceStateConnectionRepository(context);
-  const profileRepository = new WorkspaceStateProfileRepository(context);
-  const credentialsRepository = new WorkspaceStateCredentialsRepository(
-    context
-  );
-  const credentialsProvider = new AWSCredentialsProvider();
+  const connectionRepository =
+    WorkspaceStateConnectionRepository.createDefault(context);
+  const profileRepository =
+    WorkspaceStateProfileRepository.craeteDefault(context);
+  const credentialsRepository =
+    WorkspaceStateCredentialsRepository.createDefault(context);
+  const credentialsProvider = new AWSCredentialsInputBox();
   const connectionView = new ConnectionsViewProvider(
     connectionRepository,
     profileRepository,
@@ -46,13 +48,13 @@ export function activate(context: vscode.ExtensionContext) {
     credentialsProvider
   );
 
-  const sqlLogsRepository = new SQLLogWorkspaceRepository(context);
+  const sqlLogsRepository =
+    WorkspaceStateSQLLogRepository.createDefault(context);
   const sqlLogsView = new SQLLogsViewProvider(sqlLogsRepository);
 
   const outputChannel = new VSCodeStatisticsOutputChannel();
-  const queryParameterRepository = new WorkspaceStateQueryParameterRepository(
-    context
-  );
+  const queryParameterRepository =
+    WorkspaceStateQueryParameterRepository.createDefault(context);
   const queryParameterSelector = new QueryParameterSelector(
     queryParameterRepository
   );
@@ -67,24 +69,22 @@ export function activate(context: vscode.ExtensionContext) {
   );
   const queryCommandProvider = new QueryCommandProvider(queryRunner);
 
-  const profileProvider = new InputBoxProfileProvider();
+  const profileProvider = new ProfileInputBox();
   const switchProfileCommandProvider = new SwitchProfileCommandProvider(
     profileRepository,
     profileProvider
   );
-  const profileStatusViewProvider = new ProfileStatusViewProvider(
-    profileRepository
-  );
+  const profileStatusViewProvider = new ProfileStatusView(profileRepository);
   switchProfileCommandProvider.onChangeProfileStatus(() => {
     profileStatusViewProvider.refresh();
   });
-  const regionsProvider = new QuickPickRegionProvider();
+  const regionsProvider = new RegionQuickPick();
   const switchRegionCommandProvider = new SwitchRegionCommandProvider(
     connectionRepository,
     regionsProvider
   );
 
-  const workgroupProvider = new InputBoxWorkgroupProvider(connectionRepository);
+  const workgroupProvider = new WorkgroupInputBox(connectionRepository);
   const inputWorkgroupCommandProvider = new InputWorkgroupCommandProvider(
     workgroupProvider,
     connectionRepository
@@ -126,6 +126,16 @@ export function activate(context: vscode.ExtensionContext) {
       (item: TableItem) => {
         const text = `"${item.parent.database.Name}"."${item.table.Name}"`;
         vscode.env.clipboard.writeText(text);
+      }
+    ),
+    vscode.commands.registerCommand(
+      'vscode-athena-viewer.copyColumnName',
+      (item: ColumnItem) => {
+        const columnName = item.column.Name;
+        if (columnName) {
+          const text = `"${columnName}"`;
+          vscode.env.clipboard.writeText(text);
+        }
       }
     ),
     vscode.commands.registerCommand(

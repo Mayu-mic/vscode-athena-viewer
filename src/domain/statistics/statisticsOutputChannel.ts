@@ -11,11 +11,9 @@ export interface StatisticsOutputChannel {
 export class VSCodeStatisticsOutputChannel
   implements StatisticsOutputChannel, Disposable
 {
-  private channel: OutputChannel;
-
-  constructor() {
-    this.channel = window.createOutputChannel('Athena Query Statistics');
-  }
+  private channel: OutputChannel = window.createOutputChannel(
+    'Athena Query Statistics'
+  );
 
   outputStatistics(statistics: Statistics): void {
     this.channel.appendLine(`Query ok with ${statistics.outputLines} results.`);

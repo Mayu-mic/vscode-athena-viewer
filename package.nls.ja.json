@@ -4,6 +4,7 @@
   "switch-profile-title": "プロファイルを切り替える",
   "input-workgroup-title": "ワークグループを変更する",
   "copy-table-name-title": "テーブル名をコピーする",
+  "copy-column-name-title": "カラム名をコピーする",
   "profile-not-found": "接続プロファイルが設定されていません。",
   "connection-not-found": "接続設定がありません。",
   "mfa-code-not-found": "コードを入力してください。",

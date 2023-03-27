@@ -15,13 +15,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:vscode-athena-viewer.runQuery",
-    "onCommand:vscode-athena-viewer.switchRegion",
-    "onCommand:vscode-athena-viewer.switchProfile",
-    "onView:view-connection",
-    "onView:view-sql-logs"
-  ],
   "main": "./out/src/extension.js",
   "contributes": {
     "commands": [
@@ -73,6 +66,10 @@
       {
         "command": "vscode-athena-viewer.copyTableName",
         "title": "%copy-table-name-title%"
+      },
+      {
+        "command": "vscode-athena-viewer.copyColumnName",
+        "title": "%copy-column-name-title%"
       }
     ],
     "submenus": [
@@ -143,6 +140,10 @@
           "when": "view == view-connection && viewItem == table"
         },
         {
+          "command": "vscode-athena-viewer.copyColumnName",
+          "when": "view == view-connection && viewItem == column"
+        },
+        {
           "command": "vscode-athena-viewer.runSQLLog",
           "when": "view == view-sql-logs && viewItem == sql-log",
           "group": "inline"
@@ -187,7 +188,9 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
+    "lint:eslint": "eslint src --ext ts",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "npm run lint:eslint && npm run lint:tsc",
     "test": "node ./out/test/runTest.js",
     "commit": "git cz",
     "prepare": "husky install",

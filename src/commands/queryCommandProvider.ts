@@ -1,6 +1,6 @@
 import { ViewColumn, window, workspace } from 'vscode';
 import { localeString } from '../i18n';
-import { SQLLog } from '../sqlLog/sqlLog';
+import { SQLLog } from '../domain/sqlLog/sqlLog';
 import { QueryRunner } from './queryRunner';
 
 export class QueryCommandProvider {

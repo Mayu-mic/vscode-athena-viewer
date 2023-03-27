@@ -11,19 +11,22 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { AthenaClientWrapper, QueryResult } from '../athena';
-import { Connection } from '../connection/connection';
-import { ConnectionRepository } from '../connection/connectionRepository';
+import {
+  DefaultAthenaClientWrapper,
+  QueryResult,
+} from '../clients/athenaClientWrapper';
+import { Connection } from '../domain/connection/connection';
+import { ConnectionRepository } from '../domain/connection/connectionRepository';
 import { PREVIEW_DOCUMENT_SCHEME } from '../constants';
-import { CredentialsProvider } from '../credentials/credentialsProvider';
-import { CredentialsRepository } from '../credentials/credentialsRepository';
+import { AWSCredentialsProvider } from '../domain/credentials/credentialsProvider';
+import { CredentialsRepository } from '../domain/credentials/credentialsRepository';
 import { localeString } from '../i18n';
-import { StatisticsOutputChannel } from '../output/statisticsOutputChannel';
-import { ProfileRepository } from '../profile/profileRepository';
-import { QueryParameter } from '../queryParameter/queryParameter';
-import { QueryParameterSelector } from '../queryParameter/queryParameterSelector';
-import { SQLLog } from '../sqlLog/sqlLog';
-import { ISQLLogRepository } from '../sqlLog/sqlLogRepository';
+import { StatisticsOutputChannel } from '../domain/statistics/statisticsOutputChannel';
+import { ProfileRepository } from '../domain/profile/profileRepository';
+import { QueryParameter } from '../domain/queryParameter/queryParameter';
+import { QueryParameterSelector } from '../ui/queryParameterSelector';
+import { SQLLog } from '../domain/sqlLog/sqlLog';
+import { SQLLogRepository } from '../domain/sqlLog/sqlLogRepository';
 import { isParameterizedQuery } from '../util';
 
 export interface QueryRunner {
@@ -36,10 +39,10 @@ export class DefaultQueryRunner implements QueryRunner {
     private connectionsRepository: ConnectionRepository,
     private profileRespository: ProfileRepository,
     private credentialsRepository: CredentialsRepository,
-    private credentialsProvider: CredentialsProvider,
+    private credentialsProvider: AWSCredentialsProvider,
     private statisticsOutputChannel: StatisticsOutputChannel,
     private queryParameterSelector: QueryParameterSelector,
-    private sqlLogRepository: ISQLLogRepository
+    private sqlLogRepository: SQLLogRepository
   ) {}
 
   async runQuery(query: string, addLog = false): Promise<void> {
@@ -87,7 +90,10 @@ export class DefaultQueryRunner implements QueryRunner {
     connection: Connection,
     credentials: AWS.Credentials
   ): Promise<QueryResult | undefined> {
-    const client = new AthenaClientWrapper(connection.region.id, credentials);
+    const client = new DefaultAthenaClientWrapper(
+      connection.region.id,
+      credentials
+    );
 
     return await window.withProgress(
       {
